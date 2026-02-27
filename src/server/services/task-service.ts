@@ -336,7 +336,7 @@ export async function detectOverdueTasks(companyId: string) {
   for (const task of overdueTasks) {
     await prisma.activityLog.create({
       data: {
-        userId: task.assignedToId,
+        userId: task.assignedToId ?? task.createdById,
         // task.assignedToId stores owner (team lead). Assignment notifications are sent to all assignees below.
         taskId: task.id,
         action: ActivityAction.TASK_OVERDUE,

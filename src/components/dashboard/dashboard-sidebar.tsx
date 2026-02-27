@@ -203,7 +203,7 @@ const NAV_BY_ROLE: Record<SessionUser["role"], NavSection[]> = {
 };
 
 export function DashboardSidebar({ user, onNavigate }: { user: SessionUser; onNavigate?: () => void }) {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
   const navSections = NAV_BY_ROLE[user.role];
 
   function isItemActive(href: string) {

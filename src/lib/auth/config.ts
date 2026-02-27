@@ -172,11 +172,13 @@ export const authConfig: NextAuthConfig = {
           return null;
         }
 
-        const resolvedRole = user.role === "TEAM_LEAD" ? "DEPARTMENT_LEAD" : String(user.role);
+        const rawRole = String(user.role);
+        const normalizedRole = rawRole === "TEAM_LEAD" ? "DEPARTMENT_LEAD" : rawRole;
         const allowedRoles: Role[] = ["PLATFORM_OWNER", "SUPER_ADMIN", "ADMIN", "DEPARTMENT_LEAD", "EMPLOYEE"];
-        if (!allowedRoles.includes(resolvedRole as Role)) {
+        if (!allowedRoles.includes(normalizedRole as Role)) {
           return null;
         }
+        const resolvedRole = normalizedRole as Role;
 
         if (resolvedRole !== "PLATFORM_OWNER" && (!user.company || !isCompanyActive)) {
           return null;
