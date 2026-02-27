@@ -1,0 +1,3 @@
+-- No-op migration.
+-- The schema changes from this migration are already present in the target database
+-- and are covered by migration 20260226000100_multi_assignee_backlog_sprint.

@@ -1,0 +1,237 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  PLATFORM_OWNER
+  SUPER_ADMIN
+  ADMIN
+  DEPARTMENT_LEAD
+  EMPLOYEE
+}
+
+enum SprintType {
+  SPRINT
+  BACKLOG
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum TaskWorkType {
+  GENERAL
+  BACKLOG
+  SPRINT
+}
+
+enum ActivityAction {
+  TASK_CREATED
+  TASK_ASSIGNED
+  TASK_STATUS_UPDATED
+  TASK_COMMENT_ADDED
+  TASK_SOFT_DELETED
+  TASK_OVERDUE
+  SPRINT_ASSIGNED
+}
+
+model Company {
+  id            String       @id @default(cuid())
+  name          String       @unique
+  logo          String?
+  address       String?
+  website       String?
+  contactEmail  String?
+  contactPhone  String?
+  isActive      Boolean      @default(true)
+  departments   Department[]
+  users         User[]
+  tasks         Task[]
+  sprints       Sprint[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model Department {
+  id        String   @id @default(cuid())
+  name      String
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  users     User[]
+  tasks     Task[]
+  createdSprints   Sprint[] @relation("SprintDepartment")
+  assignedSprints  Sprint[] @relation("SprintAssignedDepartment")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, companyId])
+  @@index([companyId])
+}
+
+model User {
+  id             String         @id @default(cuid())
+  name           String
+  email          String         @unique
+  passwordHash   String
+  mustChangePassword Boolean     @default(false)
+  passwordUpdatedAt DateTime?
+  role           Role
+  companyId      String?
+  departmentId   String?
+  company        Company?       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  department     Department?    @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  assignedTasks  Task[]         @relation("TaskAssignedTo")
+  createdTasks   Task[]         @relation("TaskCreatedBy")
+  createdSprints Sprint[]       @relation("SprintCreatedBy")
+  assignedSprints Sprint[]      @relation("SprintAssignedTo")
+  notifications  Notification[]
+  activityLogs   ActivityLog[]
+  comments       TaskComment[]
+  taskAssignments TaskAssignment[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([companyId])
+  @@index([departmentId])
+}
+
+model Task {
+  id           String         @id @default(cuid())
+  title        String
+  description  String
+  summary      String?
+  status       TaskStatus     @default(TODO)
+  priority     TaskPriority   @default(MEDIUM)
+  workType     TaskWorkType   @default(GENERAL)
+  sprintName   String?
+  labels       String[]       @default([])
+  referenceLinks String[]     @default([])
+  richContent  String?
+  assignedAt   DateTime       @default(now())
+  deadline     DateTime
+  createdById  String
+  companyId    String
+  departmentId String?
+  assignedToId String?
+  assignedTo   User?          @relation("TaskAssignedTo", fields: [assignedToId], references: [id], onDelete: SetNull)
+  createdBy    User           @relation("TaskCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  company      Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  department   Department?    @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  sprintId     String?
+  sprint       Sprint?        @relation(fields: [sprintId], references: [id], onDelete: SetNull)
+  assignments  TaskAssignment[]
+  comments     TaskComment[]
+  activityLogs ActivityLog[]
+  deletedAt    DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([assignedToId])
+  @@index([createdById])
+  @@index([companyId])
+  @@index([departmentId])
+  @@index([status])
+  @@index([deadline])
+  @@index([sprintId])
+}
+
+model Sprint {
+  id                   String       @id @default(cuid())
+  name                 String
+  description          String?
+  type                 SprintType   @default(SPRINT)
+  companyId            String
+  departmentId         String?
+  assignedDepartmentId String?
+  createdById          String
+  assignedById         String?
+  startDate            DateTime?
+  endDate              DateTime?
+  deletedAt            DateTime?
+  tasks                Task[]
+  company              Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  department           Department?  @relation("SprintDepartment", fields: [departmentId], references: [id], onDelete: SetNull)
+  assignedDepartment   Department?  @relation("SprintAssignedDepartment", fields: [assignedDepartmentId], references: [id], onDelete: SetNull)
+  createdBy            User         @relation("SprintCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  assignedBy           User?        @relation("SprintAssignedTo", fields: [assignedById], references: [id], onDelete: SetNull)
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+
+  @@index([companyId])
+  @@index([departmentId])
+  @@index([assignedDepartmentId])
+  @@index([createdById])
+}
+
+model TaskAssignment {
+  id         String   @id @default(cuid())
+  taskId      String
+  userId      String
+  assignedById String
+  assignedAt  DateTime @default(now())
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, userId])
+  @@index([taskId])
+  @@index([userId])
+}
+
+model TaskComment {
+  id        String   @id @default(cuid())
+  content   String
+  taskId    String
+  userId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([taskId])
+  @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([read])
+}
+
+model ActivityLog {
+  id          String         @id @default(cuid())
+  userId      String
+  taskId      String?
+  action      ActivityAction
+  description String
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task        Task?          @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  createdAt   DateTime       @default(now())
+
+  @@index([userId])
+  @@index([taskId])
+  @@index([action])
+}

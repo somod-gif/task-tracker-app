@@ -1,4 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Task Tracker (Internal SaaS)
+
+Internal Task Management and Tracking System for:
+
+- Ashlab Technologies
+- Quodel Technologies Limited
+
+### Why there is no Register page
+
+This is an internal enterprise platform. Users are provisioned by HR/Admin, not self-registered.
+
+- Bootstrap users are created via seed script.
+- After login, `ADMIN` users can create employees and promote team leads from dashboard.
+
+### Initial setup
+
+1. Ensure `.env` contains `DATABASE_URL`, `NEXTAUTH_SECRET`, and `NEXTAUTH_URL`.
+2. Run migrations and generate Prisma client:
+
+```bash
+npm run db:migrate
+npm run db:generate
+```
+
+3. Seed initial companies/departments/users:
+
+```bash
+npm run db:seed
+```
+
+If migrations are already present and you only need local schema sync + seed:
+
+```bash
+npx prisma migrate deploy
+npm run db:generate
+npm run db:seed
+```
+
+Optional custom default password:
+
+```bash
+SEED_DEFAULT_PASSWORD="YourStrongPassword" npm run db:seed
+```
+
+### Platform Owner login (demo/local)
+
+- Default username/email: `platform@sprintdesk.local`
+- Default password: `password`
+- You can override with env vars before seeding:
+
+```bash
+BOOTSTRAP_PLATFORM_OWNER_EMAIL="your-demo-id@local" \
+BOOTSTRAP_PLATFORM_OWNER_PASSWORD="your-password" \
+BOOTSTRAP_PLATFORM_OWNER_USERNAME="platform_owner" \
+npm run db:seed
+```
+
+`BOOTSTRAP_PLATFORM_OWNER_USERNAME` lets you sign in with a username alias (no real email provider required in local/dev).
+
+### Starter login accounts
+
+- `superadmin@ashlab.internal` (SUPER_ADMIN)
+- `admin@ashlab.internal` (ADMIN)
+- `lead@ashlab.internal` (TEAM_LEAD)
+- `employee@ashlab.internal` (EMPLOYEE)
+- `admin@quodel.internal` (ADMIN)
+- `lead@quodel.internal` (TEAM_LEAD)
+- `employee@quodel.internal` (EMPLOYEE)
+
+Password: value from `SEED_DEFAULT_PASSWORD` or fallback `ChangeMe@123`.
+
+### Run app
+
+```bash
+npm run dev
+```
 
 ## Getting Started
 
