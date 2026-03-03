@@ -135,6 +135,7 @@ async function isCompanyAllowedToLogin(companyId: string | null | undefined, fal
 }
 
 export const authConfig: NextAuthConfig = {
+  trustHost: true,
   session: { strategy: "jwt" },
   pages: { signIn: "/login" },
   providers: [
