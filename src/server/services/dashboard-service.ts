@@ -1,5 +1,6 @@
 import { requireCompanyId, type SessionUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
+import { withPrismaRetry } from "@/lib/prisma/retry";
 
 export async function getPlatformOwnerOverview() {
   const [companies, activeCompanies, users, superAdmins] = await Promise.all([
@@ -95,26 +96,35 @@ export async function getAdminOverview(user: SessionUser) {
   const companyId = requireCompanyId(user);
   const departmentFilter = user.departmentId ? { departmentId: user.departmentId } : {};
 
-  const [departments, employees, teamLeads, tasks] = await Promise.all([
-    prisma.department.findMany({
+  const [departments, employees, teamLeads, tasks, users] = await withPrismaRetry(async () => {
+    const departments = await prisma.department.findMany({
       where: { companyId },
+      select: {
+        id: true,
+        name: true,
+      },
       orderBy: { name: "asc" },
-    }),
-    prisma.user.count({ where: { companyId, role: "EMPLOYEE" } }),
-    prisma.user.count({ where: { companyId, role: "DEPARTMENT_LEAD" } }),
-    prisma.task.count({ where: { companyId, deletedAt: null, ...departmentFilter } }),
-  ]);
+    });
 
-  const users = await prisma.user.findMany({
-    where: { companyId },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      department: { select: { name: true, id: true } },
-    },
-    orderBy: [{ role: "asc" }, { name: "asc" }],
+    const [employees, teamLeads, tasks] = await Promise.all([
+      prisma.user.count({ where: { companyId, role: "EMPLOYEE" } }),
+      prisma.user.count({ where: { companyId, role: "DEPARTMENT_LEAD" } }),
+      prisma.task.count({ where: { companyId, deletedAt: null, ...departmentFilter } }),
+    ]);
+
+    const users = await prisma.user.findMany({
+      where: { companyId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        department: { select: { name: true, id: true } },
+      },
+      orderBy: [{ role: "asc" }, { name: "asc" }],
+    });
+
+    return [departments, employees, teamLeads, tasks, users] as const;
   });
 
   return {

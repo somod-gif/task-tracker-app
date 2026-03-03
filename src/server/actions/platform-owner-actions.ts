@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/rbac";
 import { assignSuperAdminSchema, companyCrudSchema, registerCompanySchema } from "@/lib/validation/platform";
+import { createNotification } from "@/server/services/notification-service";
 
 function normalizeEmpty(value: FormDataEntryValue | null) {
   if (value == null) return undefined;
@@ -31,7 +32,7 @@ export async function createCompanyByPlatformOwnerAction(_prevState: unknown, fo
   }
 
   await prisma.company.create({ data: parsed.data });
-  revalidatePath("/dashboard/platform-owner");
+  revalidatePath("/dashboard");
   return { success: true, error: "" };
 }
 
@@ -55,26 +56,91 @@ export async function updateCompanyByPlatformOwnerAction(_prevState: unknown, fo
 
   const { id, ...data } = parsed.data;
   await prisma.company.update({ where: { id }, data });
-  revalidatePath("/dashboard/platform-owner");
+  revalidatePath("/dashboard");
   return { success: true, error: "" };
 }
 
 export async function toggleCompanyActiveAction(companyId: string) {
   await requireRole(["PLATFORM_OWNER"]);
 
-  const affected = await prisma.$executeRawUnsafe(
-    'UPDATE "Company" SET "isActive" = NOT "isActive", "updatedAt" = NOW() WHERE "id" = $1',
-    companyId,
-  );
-  if (!affected) throw new Error("Company not found");
+  const company = await prisma.company.findUnique({ where: { id: companyId }, select: { id: true, name: true, isActive: true } });
+  if (!company) throw new Error("Company not found");
 
-  revalidatePath("/dashboard/platform-owner");
+  const updated = await prisma.company.update({
+    where: { id: companyId },
+    data: { isActive: !company.isActive },
+    select: { id: true, name: true, isActive: true },
+  });
+
+  if (updated.isActive) {
+    const superAdmins = await prisma.user.findMany({
+      where: {
+        companyId: updated.id,
+        role: "SUPER_ADMIN",
+      },
+      select: { id: true },
+    });
+
+    await Promise.all(
+      superAdmins.map((admin) =>
+        createNotification({
+          userId: admin.id,
+          companyId: updated.id,
+          title: "Company Approved",
+          message: `${updated.name} is now approved and active on Sprint Desk.`,
+          type: "COMPANY_APPROVED",
+        }),
+      ),
+    );
+  }
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/pending-approvals");
 }
 
 export async function deleteCompanyAction(companyId: string) {
   await requireRole(["PLATFORM_OWNER"]);
   await prisma.company.delete({ where: { id: companyId } });
-  revalidatePath("/dashboard/platform-owner");
+  revalidatePath("/dashboard");
+}
+
+export async function approveCompanyAction(companyId: string) {
+  await requireRole(["PLATFORM_OWNER"]);
+
+  const company = await prisma.company.update({
+    where: { id: companyId },
+    data: { isActive: true },
+    select: { id: true, name: true },
+  });
+
+  // Notify all Super Admins in this company
+  const superAdmins = await prisma.user.findMany({
+    where: { companyId: company.id, role: "SUPER_ADMIN" },
+    select: { id: true },
+  });
+
+  await Promise.all(
+    superAdmins.map((admin) =>
+      createNotification({
+        userId: admin.id,
+        companyId: company.id,
+        title: "Company Approved",
+        message: `${company.name} has been approved and is now active on Sprint Desk. You can now sign in and set up your workspace.`,
+        type: "COMPANY_APPROVED",
+      }),
+    ),
+  );
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/pending-approvals");
+}
+
+export async function rejectCompanyAction(companyId: string) {
+  await requireRole(["PLATFORM_OWNER"]);
+  // Deletes company and cascades to users
+  await prisma.company.delete({ where: { id: companyId } });
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/pending-approvals");
 }
 
 export async function assignUserAsSuperAdminAction(companyId: string, userId: string) {
@@ -89,7 +155,7 @@ export async function assignUserAsSuperAdminAction(companyId: string, userId: st
     data: { role: "SUPER_ADMIN" },
   });
 
-  revalidatePath("/dashboard/platform-owner");
+  revalidatePath("/dashboard");
 }
 
 export async function registerCompanyRequestAction(_prevState: unknown, formData: FormData) {

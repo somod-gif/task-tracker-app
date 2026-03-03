@@ -31,7 +31,7 @@ export function PublicFooter() {
         </div>
       </div>
       <div className="border-t border-border/70 px-4 py-4 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} Sprint Desk. All rights reserved.
+        <span suppressHydrationWarning>© {new Date().getFullYear()} Sprint Desk. All rights reserved.</span>
       </div>
     </footer>
   );

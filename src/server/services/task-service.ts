@@ -1,5 +1,6 @@
 import { requireCompanyId, type SessionUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
+import { withPrismaRetry } from "@/lib/prisma/retry";
 import { createNotification } from "@/server/services/notification-service";
 import type { TaskPriority, TaskStatus, TaskWorkType } from "@/types/domain";
 
@@ -15,6 +16,9 @@ const ActivityAction = {
 const TaskStatusValue = {
   DONE: "DONE",
 } as const;
+
+const overdueSyncByCompany = new Map<string, number>();
+const OVERDUE_SYNC_INTERVAL_MS = 60_000;
 
 type CreateTaskInput = {
   title: string;
@@ -69,9 +73,9 @@ function buildTaskScope(user: SessionUser) {
 
 export async function listTasksForUser(user: SessionUser) {
   const companyId = requireCompanyId(user);
-  await detectOverdueTasks(companyId);
+  void detectOverdueTasks(companyId).catch(() => undefined);
 
-  return prisma.task.findMany({
+  return withPrismaRetry(() => prisma.task.findMany({
     where: {
       deletedAt: null,
       ...buildTaskScope(user),
@@ -97,7 +101,7 @@ export async function listTasksForUser(user: SessionUser) {
       },
     },
     orderBy: [{ status: "asc" }, { deadline: "asc" }],
-  });
+  }));
 }
 
 export async function listAssignableMembers(user: SessionUser) {
@@ -107,7 +111,7 @@ export async function listAssignableMembers(user: SessionUser) {
 
   const companyId = requireCompanyId(user);
 
-  return prisma.user.findMany({
+  return withPrismaRetry(() => prisma.user.findMany({
     where: {
       companyId,
       departmentId: user.departmentId ?? "NO_DEPARTMENT",
@@ -122,7 +126,7 @@ export async function listAssignableMembers(user: SessionUser) {
     orderBy: {
       name: "asc",
     },
-  });
+  }));
 }
 
 export async function createTask(user: SessionUser, input: CreateTaskInput) {
@@ -201,7 +205,13 @@ export async function createTask(user: SessionUser, input: CreateTaskInput) {
 
   await Promise.all([
     ...assignees.map((member) =>
-      createNotification(member.id, "New Task Assigned", `You have been assigned: ${task.title}`),
+      createNotification({
+        userId: member.id,
+        companyId,
+        title: "New Task Assigned",
+        message: `You have been assigned: ${task.title}`,
+        type: "TASK_ASSIGNED",
+      }),
     ),
     prisma.activityLog.create({
       data: {
@@ -277,7 +287,13 @@ export async function updateTaskStatus(user: SessionUser, input: UpdateTaskStatu
     ],
   });
 
-  await createNotification(task.createdById, "Task Status Updated", `${task.title} is now ${input.status}`);
+  await createNotification({
+    userId: task.createdById,
+    companyId: task.companyId,
+    title: "Task Status Updated",
+    message: `${task.title} is now ${input.status}`,
+    type: "TASK_UPDATED",
+  });
 
   return updatedTask;
 }
@@ -319,7 +335,14 @@ export async function softDeleteTask(user: SessionUser, taskId: string) {
 }
 
 export async function detectOverdueTasks(companyId: string) {
-  const overdueTasks = await prisma.task.findMany({
+  const now = Date.now();
+  const lastSyncAt = overdueSyncByCompany.get(companyId) ?? 0;
+  if (now - lastSyncAt < OVERDUE_SYNC_INTERVAL_MS) {
+    return 0;
+  }
+  overdueSyncByCompany.set(companyId, now);
+
+  const overdueTasks = await withPrismaRetry(() => prisma.task.findMany({
     where: {
       companyId,
       deletedAt: null,
@@ -331,7 +354,7 @@ export async function detectOverdueTasks(companyId: string) {
         },
       },
     },
-  });
+  }));
 
   for (const task of overdueTasks) {
     await prisma.activityLog.create({
@@ -351,7 +374,13 @@ export async function detectOverdueTasks(companyId: string) {
 
     await Promise.all(
       assignees.map((assignee) =>
-        createNotification(assignee.userId, "Task Overdue", `${task.title} is overdue. Please update progress.`),
+        createNotification({
+          userId: assignee.userId,
+          companyId,
+          title: "Task Overdue",
+          message: `${task.title} is overdue. Please update progress.`,
+          type: "TASK_OVERDUE",
+        }),
       ),
     );
   }

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Bell } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
@@ -11,9 +12,10 @@ import { appToast } from "@/lib/toast";
 
 type NotificationItem = {
   id: string;
+  type: "TASK_ASSIGNED" | "TASK_UPDATED" | "TASK_OVERDUE" | "SPRINT_ASSIGNED" | "COMPANY_APPROVED" | "SYSTEM";
   title: string;
   message: string;
-  read: boolean;
+  isRead: boolean;
   createdAt: string;
 };
 
@@ -23,10 +25,10 @@ export function NotificationBell() {
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
 
-  const unreadCount = useMemo(() => notifications.filter((n) => !n.read).length, [notifications]);
+  const unreadCount = useMemo(() => notifications.filter((n) => !n.isRead).length, [notifications]);
 
   async function markRead(notificationId: string) {
-    setNotifications((current) => current.map((n) => (n.id === notificationId ? { ...n, read: true } : n)));
+    setNotifications((current) => current.map((n) => (n.id === notificationId ? { ...n, isRead: true } : n)));
     await fetch("/api/notifications", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -35,7 +37,7 @@ export function NotificationBell() {
   }
 
   async function markAllRead() {
-    setNotifications((current) => current.map((n) => ({ ...n, read: true })));
+    setNotifications((current) => current.map((n) => ({ ...n, isRead: true })));
     await fetch("/api/notifications", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -77,7 +79,7 @@ export function NotificationBell() {
       }
 
       const onNotification = (payload: NotificationItem) => {
-        setNotifications((current) => [{ ...payload, read: false }, ...current]);
+        setNotifications((current) => [{ ...payload, isRead: false }, ...current].slice(0, 10));
         appToast.info(`${payload.title}: ${payload.message}`);
       };
 
@@ -116,7 +118,7 @@ export function NotificationBell() {
           <div className="max-h-80 space-y-2 overflow-auto">
             {loading ? <p className="text-xs text-muted-foreground">Loading...</p> : null}
             {!loading && notifications.length === 0 ? <p className="text-xs text-muted-foreground">No notifications</p> : null}
-            {notifications.map((item) => (
+            {notifications.slice(0, 10).map((item) => (
               <button
                 key={item.id}
                 onClick={() => void markRead(item.id)}
@@ -124,11 +126,16 @@ export function NotificationBell() {
               >
                 <div className="mb-1 flex items-center gap-2">
                   <p className="text-sm font-medium">{item.title}</p>
-                  {!item.read ? <Badge variant="secondary">New</Badge> : null}
+                  {!item.isRead ? <Badge variant="secondary">New</Badge> : null}
                 </div>
                 <p className="text-xs text-muted-foreground">{item.message}</p>
               </button>
             ))}
+          </div>
+          <div className="mt-3 border-t pt-2 text-right">
+            <Link href="/dashboard/notifications" className="text-xs font-medium text-primary hover:underline" onClick={() => setOpen(false)}>
+              View all
+            </Link>
           </div>
         </div>
       ) : null}

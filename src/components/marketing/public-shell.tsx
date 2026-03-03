@@ -7,7 +7,7 @@ export function PublicShell({ activePath, children }: { activePath: string; chil
   return (
     <div className="min-h-screen bg-background">
       <PublicNavbar activePath={activePath} />
-      {children}
+      <div className="animate-in fade-in-0 duration-300">{children}</div>
       <PublicFooter />
     </div>
   );

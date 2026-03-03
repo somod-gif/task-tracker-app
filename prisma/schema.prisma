@@ -53,6 +53,15 @@ enum ActivityAction {
   SPRINT_ASSIGNED
 }
 
+enum NotificationType {
+  TASK_ASSIGNED
+  TASK_UPDATED
+  TASK_OVERDUE
+  SPRINT_ASSIGNED
+  COMPANY_APPROVED
+  SYSTEM
+}
+
 model Company {
   id            String       @id @default(cuid())
   name          String       @unique
@@ -66,6 +75,7 @@ model Company {
   users         User[]
   tasks         Task[]
   sprints       Sprint[]
+  notifications Notification[]
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
 }
@@ -211,13 +221,20 @@ model TaskComment {
 model Notification {
   id        String   @id @default(cuid())
   userId    String
+  companyId String?
+  type      NotificationType @default(SYSTEM)
+  isRead    Boolean  @default(false)
   title     String
   message   String
   read      Boolean  @default(false)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
   createdAt DateTime @default(now())
 
   @@index([userId])
+  @@index([companyId])
+  @@index([type])
+  @@index([isRead])
   @@index([read])
 }
 

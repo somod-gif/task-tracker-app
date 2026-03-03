@@ -30,6 +30,24 @@ type SprintDelegate = {
     };
     orderBy: { createdAt: "desc" };
   }) => Promise<unknown>;
+  updateMany: (args: {
+    where: {
+      id: string;
+      companyId: string;
+      deletedAt: null;
+    };
+    data: {
+      name?: string;
+      description?: string;
+      type?: SprintType;
+      departmentId?: string;
+      assignedDepartmentId?: string;
+      assignedById?: string;
+      startDate?: Date;
+      endDate?: Date;
+      deletedAt?: Date;
+    };
+  }) => Promise<{ count: number }>;
 };
 
 type PrismaWithSprint = typeof prisma & {
@@ -37,6 +55,16 @@ type PrismaWithSprint = typeof prisma & {
 };
 
 type CreateSprintInput = {
+  name: string;
+  description?: string;
+  type: SprintType;
+  departmentId?: string;
+  startDate?: Date;
+  endDate?: Date;
+};
+
+type UpdateSprintInput = {
+  sprintId: string;
   name: string;
   description?: string;
   type: SprintType;
@@ -80,11 +108,13 @@ export async function createSprint(user: SessionUser, input: CreateSprintInput) 
 
     await Promise.all(
       departmentLeads.map((lead) =>
-        createNotification(
-          lead.id,
-          "Sprint Assigned",
-          `${input.type === "BACKLOG" ? "Backlog" : "Sprint"} \"${input.name}\" has been assigned to your department.`,
-        ),
+        createNotification({
+          userId: lead.id,
+          companyId,
+          title: "Sprint Assigned",
+          message: `${input.type === "BACKLOG" ? "Backlog" : "Sprint"} \"${input.name}\" has been assigned to your department.`,
+          type: "SPRINT_ASSIGNED",
+        }),
       ),
     );
   }
@@ -116,4 +146,79 @@ export async function listSprintsForCompany(user: SessionUser) {
     },
     orderBy: { createdAt: "desc" },
   });
+}
+
+export async function updateSprint(user: SessionUser, input: UpdateSprintInput) {
+  if (![("SUPER_ADMIN"), ("ADMIN")].includes(user.role)) {
+    throw new Error("Only Super Admin or Admin can update sprint/backlog");
+  }
+
+  const companyId = requireCompanyId(user);
+  const db = prisma as unknown as PrismaWithSprint;
+
+  const result = await db.sprint.updateMany({
+    where: {
+      id: input.sprintId,
+      companyId,
+      deletedAt: null,
+    },
+    data: {
+      name: input.name,
+      description: input.description,
+      type: input.type,
+      departmentId: input.departmentId,
+      assignedDepartmentId: input.departmentId,
+      assignedById: user.id,
+      startDate: input.startDate,
+      endDate: input.endDate,
+    },
+  });
+
+  if (!result.count) {
+    throw new Error("Sprint not found");
+  }
+
+  await prisma.activityLog.create({
+    data: {
+      userId: user.id,
+      action: "SPRINT_ASSIGNED" as never,
+      description: `Sprint updated: ${input.name}`,
+    },
+  });
+
+  return { success: true };
+}
+
+export async function softDeleteSprint(user: SessionUser, sprintId: string) {
+  if (![("SUPER_ADMIN"), ("ADMIN")].includes(user.role)) {
+    throw new Error("Only Super Admin or Admin can delete sprint/backlog");
+  }
+
+  const companyId = requireCompanyId(user);
+  const db = prisma as unknown as PrismaWithSprint;
+
+  const result = await db.sprint.updateMany({
+    where: {
+      id: sprintId,
+      companyId,
+      deletedAt: null,
+    },
+    data: {
+      deletedAt: new Date(),
+    },
+  });
+
+  if (!result.count) {
+    throw new Error("Sprint not found");
+  }
+
+  await prisma.activityLog.create({
+    data: {
+      userId: user.id,
+      action: "SPRINT_ASSIGNED" as never,
+      description: `Sprint deleted: ${sprintId}`,
+    },
+  });
+
+  return { success: true };
 }

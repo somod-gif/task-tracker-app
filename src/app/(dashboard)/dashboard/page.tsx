@@ -17,6 +17,7 @@ import {
 	getSuperAdminOverview,
 	getTeamLeadOverview,
 } from "@/server/services/dashboard-service";
+import { listSprintsForCompany } from "@/server/services/sprint-service";
 import { listAssignableMembers, listTasksForUser } from "@/server/services/task-service";
 
 function buildTaskStatusData(tasks: Array<{ status: "TODO" | "IN_PROGRESS" | "DONE" }>) {
@@ -83,7 +84,7 @@ export default async function DashboardPage() {
 						className="border-primary/30 bg-primary text-primary-foreground"
 					/>
 
-					<div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+					<div className="grid grid-cols-2 gap-5 xl:grid-cols-4">
 						<MetricCard title="Companies" value={overview.metrics.companies} helper="Tenant organizations" />
 						<MetricCard title="Active Companies" value={overview.metrics.activeCompanies} helper="Operational tenants" />
 						<MetricCard title="Users" value={overview.metrics.users} helper="Cross-company active users" />
@@ -123,7 +124,7 @@ export default async function DashboardPage() {
 	}
 
 	if (user.role === "SUPER_ADMIN") {
-		const [overview, tasks, departments] = await Promise.all([
+		const [overview, tasks, departments, sprints] = await Promise.all([
 			getSuperAdminOverview(),
 			listTasksForUser(user),
 			user.companyId
@@ -133,6 +134,7 @@ export default async function DashboardPage() {
 						orderBy: { name: "asc" },
 					})
 				: Promise.resolve([]),
+			listSprintsForCompany(user),
 		]);
 
 		return (
@@ -144,7 +146,7 @@ export default async function DashboardPage() {
 						badge="Super Admin"
 					/>
 
-					<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+					<div className="grid grid-cols-2 gap-4 xl:grid-cols-5">
 						<MetricCard title="Companies" value={overview.metrics.companies} helper="Tenant organizations" />
 						<MetricCard title="Departments" value={overview.metrics.departments} helper="Operational units" />
 						<MetricCard title="Users" value={overview.metrics.users} helper="Platform users" />
@@ -158,7 +160,7 @@ export default async function DashboardPage() {
 							description="Current task progress across your scope."
 							data={buildTaskStatusData(tasks)}
 						/>
-						<SprintManagement departments={departments} />
+						<SprintManagement departments={departments} sprints={sprints as Array<{ id: string; name: string; description: string | null; type: "SPRINT" | "BACKLOG"; departmentId: string | null; startDate: Date | null; endDate: Date | null }>} />
 					</div>
 
 					<SectionCard title="Recent Tasks" description="Latest tasks visible in your dashboard scope.">
@@ -170,7 +172,7 @@ export default async function DashboardPage() {
 	}
 
 	if (user.role === "ADMIN") {
-		const [overview, tasks] = await Promise.all([getAdminOverview(user), listTasksForUser(user)]);
+		const [overview, tasks, sprints] = await Promise.all([getAdminOverview(user), listTasksForUser(user), listSprintsForCompany(user)]);
 
 		return (
 			<DashboardShell user={user} title="Dashboard">
@@ -181,7 +183,7 @@ export default async function DashboardPage() {
 						badge="Admin / CEO"
 					/>
 
-					<div className="grid gap-5 md:grid-cols-2 xl:grid-cols-5">
+					<div className="grid grid-cols-2 gap-5 xl:grid-cols-5">
 						<MetricCard title="Departments" value={overview.metrics.departments} helper="Managed units" />
 						<MetricCard title="Employees" value={overview.metrics.employees} helper="Company workforce" />
 						<MetricCard title="Team Leads" value={overview.metrics.teamLeads} helper="Department leaders" />
@@ -200,7 +202,7 @@ export default async function DashboardPage() {
 							data={buildTaskStatusData(tasks)}
 						/>
 
-						<SprintManagement departments={overview.departments} />
+						<SprintManagement departments={overview.departments} sprints={sprints as Array<{ id: string; name: string; description: string | null; type: "SPRINT" | "BACKLOG"; departmentId: string | null; startDate: Date | null; endDate: Date | null }>} />
 						<AdminManagement departments={overview.departments} users={overview.users} />
 					</div>
 
@@ -228,7 +230,7 @@ export default async function DashboardPage() {
 						badge="Department Lead"
 					/>
 
-					<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+					<div className="grid grid-cols-2 gap-4 xl:grid-cols-5">
 						<MetricCard title="Team Members" value={overview.metrics.teamMembers} helper="Assignable teammates" />
 						<MetricCard title="Tasks" value={overview.metrics.tasks} helper="Department tasks" />
 						<MetricCard title="Completed" value={overview.metrics.completedTasks} helper="Finished deliveries" />
@@ -282,7 +284,7 @@ export default async function DashboardPage() {
 					className="bg-background"
 				/>
 
-				<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+				<div className="grid grid-cols-2 gap-4 xl:grid-cols-5">
 					<MetricCard title="Assigned" value={overview.metrics.assignedTasks} helper="Tasks assigned to you" />
 					<MetricCard title="In Progress" value={overview.metrics.inProgress} helper="Currently active" />
 					<MetricCard title="Done" value={overview.metrics.done} helper="Completed tasks" />
