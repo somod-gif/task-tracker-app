@@ -1,47 +1,39 @@
+import { getToken } from "next-auth/jwt";
 import { NextResponse, type NextRequest } from "next/server";
 
-import { auth } from "@/auth";
-import { dashboardByRole, isAllowedForPath, PUBLIC_PATHS } from "@/lib/rbac";
+import { dashboardByRole, isAllowedForPath, PUBLIC_PATHS } from "@/lib/rbac/paths";
 
 function isPublicPath(pathname: string) {
   return PUBLIC_PATHS.some((path) => {
-    if (path === "/") {
-      return pathname === "/";
-    }
+    if (path === "/") return pathname === "/";
     return pathname === path || pathname.startsWith(`${path}/`);
   });
 }
 
-export default auth((req: NextRequest) => {
-  const request = req as NextRequest & {
-    auth?: { user?: { role?: string; mustChangePassword?: boolean } };
-  };
-  const pathname = request.nextUrl.pathname;
+export async function middleware(req: NextRequest) {
+  const pathname = req.nextUrl.pathname;
 
-  if (isPublicPath(pathname)) {
-    return NextResponse.next();
+  if (isPublicPath(pathname)) return NextResponse.next();
+  if (!pathname.startsWith("/dashboard")) return NextResponse.next();
+
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+
+  if (!token?.sub) {
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  if (!pathname.startsWith("/dashboard")) {
-    return NextResponse.next();
+  if (token.mustChangePassword && !pathname.startsWith("/dashboard/change-password")) {
+    return NextResponse.redirect(new URL("/dashboard/change-password", req.url));
   }
 
-  if (!request.auth?.user) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-
-  if (request.auth.user.mustChangePassword && !pathname.startsWith("/dashboard/change-password")) {
-    return NextResponse.redirect(new URL("/dashboard/change-password", request.url));
-  }
-
-  const role = request.auth.user.role;
+  const role = token.role as string | undefined;
   if (!role || !isAllowedForPath(pathname, role)) {
     const fallback = dashboardByRole[role as keyof typeof dashboardByRole] ?? "/";
-    return NextResponse.redirect(new URL(fallback, request.url));
+    return NextResponse.redirect(new URL(fallback, req.url));
   }
 
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: ["/dashboard/:path*", "/login", "/", "/about", "/services", "/testimonials", "/contact"],
