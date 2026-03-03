@@ -16,7 +16,15 @@ export async function middleware(req: NextRequest) {
   if (isPublicPath(pathname)) return NextResponse.next();
   if (!pathname.startsWith("/dashboard")) return NextResponse.next();
 
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET;
+
+  // next-auth v5 renamed the cookie: __Secure- prefix on HTTPS, plain on HTTP
+  const isSecure = req.nextUrl.protocol === "https:";
+  const cookieName = isSecure
+    ? "__Secure-authjs.session-token"
+    : "authjs.session-token";
+
+  const token = await getToken({ req, secret, cookieName });
 
   if (!token?.sub) {
     return NextResponse.redirect(new URL("/login", req.url));
@@ -36,5 +44,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login", "/", "/about", "/services", "/testimonials", "/contact"],
+  matcher: ["/dashboard/:path*"],
 };
