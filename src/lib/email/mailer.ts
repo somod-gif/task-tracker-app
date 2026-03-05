@@ -20,7 +20,7 @@ async function send(mail: Mail): Promise<void> {
   }
   try {
     const nodemailer = (await import("nodemailer")) as typeof import("nodemailer");
-    const t = nodemailer.createTransport({ host, port, secure: port === 465, auth: { user, pass } });
+    const t = nodemailer.createTransport({ host, port, secure: port === 465, requireTLS: port !== 465, auth: { user, pass } });
     await t.sendMail({
       from: process.env.SMTP_FROM ?? `Sprint Desk <${user}>`,
       to: mail.to, subject: mail.subject, html: mail.html,
