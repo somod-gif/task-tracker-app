@@ -27,7 +27,7 @@ type Props = {
   userAvatar?: string | null;
 };
 
-export function WorkspaceSidebar({ userId, userName, userEmail, userAvatar }: Props) {
+export function WorkspaceSidebar({ userName, userEmail, userAvatar }: Props) {
   const pathname = usePathname();
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [unread, setUnread] = useState(0);

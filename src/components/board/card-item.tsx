@@ -1,7 +1,6 @@
 "use client";
 
-import { CalendarDays, MessageSquare, User } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { CalendarDays, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type CardData = {

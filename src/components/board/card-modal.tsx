@@ -5,7 +5,6 @@ import { X, Calendar, Flag, Loader2, Trash2, UserPlus, UserMinus, Send } from "l
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
 import {
   getCardDetailAction,
   updateCardAction,
@@ -35,13 +34,6 @@ type CardDetail = {
 };
 
 const PRIORITIES = ["LOW", "MEDIUM", "HIGH", "URGENT"] as const;
-const PRIORITY_COLORS: Record<string, string> = {
-  LOW: "bg-slate-100 text-slate-600",
-  MEDIUM: "bg-blue-100 text-blue-700",
-  HIGH: "bg-amber-100 text-amber-700",
-  URGENT: "bg-red-100 text-red-700",
-};
-
 type Props = {
   cardId: string;
   workspaceId: string;
@@ -52,7 +44,7 @@ type Props = {
   onCardDeleted?: () => void;
 };
 
-export function CardModal({ cardId, workspaceId, workspaceMembers, currentUserId, canManage, onClose, onCardDeleted }: Props) {
+export function CardModal({ cardId, workspaceId, workspaceMembers, canManage, onClose, onCardDeleted }: Props) {
   const [card, setCard] = useState<CardDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [editTitle, setEditTitle] = useState(false);

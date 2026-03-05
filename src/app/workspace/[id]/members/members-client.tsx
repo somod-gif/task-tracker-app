@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { UserMinus, ChevronDown } from "lucide-react";
+import { UserMinus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { removeMemberAction, updateMemberRoleAction } from "@/server/actions/workspace-actions";
 import { InviteMemberDialog } from "@/components/workspace/invite-member-dialog";
@@ -25,7 +25,7 @@ const ROLE_COLORS: Record<string, string> = {
   MEMBER: "bg-slate-100 text-slate-600",
 };
 
-export function MembersClient({ workspaceId, workspaceName, members: initial, currentUserId, currentUserRole, canManage }: Props) {
+export function MembersClient({ workspaceId, workspaceName, members: initial, currentUserId, canManage }: Props) {
   const [members, setMembers] = useState(initial);
   const [isPending, startTransition] = useTransition();
 
