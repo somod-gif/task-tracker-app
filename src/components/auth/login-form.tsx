@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useActionState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 
@@ -14,53 +15,60 @@ import { appToast } from "@/lib/toast";
 
 export function LoginForm() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
 
-  async function onSubmit(formData: FormData) {
-    setLoading(true);
-    const result = await signIn("credentials", {
-      identifier: String(formData.get("identifier") ?? ""),
-      password: String(formData.get("password") ?? ""),
-      redirect: false,
-    });
+  async function handleLogin(_prevState: unknown, formData: FormData) {
+    const email = String(formData.get("email") ?? "");
+    const password = String(formData.get("password") ?? "");
+
+    const result = await signIn("credentials", { email, password, redirect: false });
 
     if (result?.error) {
-      appToast.error("Invalid credentials.");
-      setLoading(false);
-      return;
+      return { success: false, error: "Invalid email or password" };
     }
 
-    appToast.success("Signed in successfully.");
-    router.push("/");
-    router.refresh();
+    return { success: true, error: "" };
   }
 
+  const [state, formAction, pending] = useActionState(handleLogin, { success: false, error: "" });
+
+  useEffect(() => {
+    if (state.success) {
+      appToast.success("Signed in successfully!");
+      router.push("/workspace");
+      router.refresh();
+    } else if (state.error) {
+      appToast.error(state.error);
+    }
+  }, [state, router]);
+
   return (
-    <Card className="w-full max-w-lg border-border/70 bg-background/90 shadow-md">
-      <CardHeader className="space-y-3 pb-4">
-        <div className="flex justify-end">
-          <Link href="/" className="text-sm font-medium text-primary hover:underline">
-            Back to Home
-          </Link>
-        </div>
-        <CardTitle className="text-center text-4xl font-bold tracking-tight">Welcome Back</CardTitle>
-        <p className="text-center text-lg text-muted-foreground">Sign in to continue</p>
+    <Card className="w-full max-w-md border border-border/60 bg-card shadow-xl">
+      <CardHeader className="space-y-1 pb-4">
+        <CardTitle className="text-center text-3xl font-bold tracking-tight">Welcome back</CardTitle>
+        <p className="text-center text-sm text-muted-foreground">Sign in to your Sprint Desk account</p>
       </CardHeader>
       <CardContent>
-        <form action={onSubmit} className="space-y-5">
-          <div className="space-y-2">
-            <Label htmlFor="identifier">Email Address</Label>
-            <Input id="identifier" name="identifier" type="text" required />
+        <form action={formAction} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="email">Email address</Label>
+            <Input id="email" name="email" type="email" placeholder="you@example.com" required autoFocus />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <Label htmlFor="password">Password</Label>
             <PasswordInput id="password" name="password" required />
           </div>
-          <Button className="h-12 w-full text-2xl font-bold" type="submit" disabled={loading}>
-            {loading ? "Signing in..." : "Sign in"}
+          <Button className="h-11 w-full font-semibold text-base" type="submit" disabled={pending}>
+            {pending ? "Signing in…" : "Sign in"}
           </Button>
         </form>
+        <p className="mt-4 text-center text-sm text-muted-foreground">
+          Don&apos;t have an account?{" "}
+          <Link href="/register" className="font-medium text-primary hover:underline">
+            Create one
+          </Link>
+        </p>
       </CardContent>
     </Card>
   );
 }
+

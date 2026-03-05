@@ -86,7 +86,7 @@ export function PublicNavbar({ activePath }: { activePath: string }) {
             size="sm"
             className="hidden lg:inline-flex hover:bg-primary/10 hover:text-primary"
           >
-            <Link href="/register-company">Register Company</Link>
+            <Link href="/register">Sign Up Free</Link>
           </Button>
           <Button 
             asChild 
@@ -185,8 +185,8 @@ export function PublicNavbar({ activePath }: { activePath: string }) {
                 size="default" 
                 className="w-full"
               >
-                <Link href="/register-company" onClick={() => setIsMenuOpen(false)}>
-                  Register Company
+                <Link href="/register" onClick={() => setIsMenuOpen(false)}>
+                  Sign Up Free
                 </Link>
               </Button>
               <Button 

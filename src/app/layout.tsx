@@ -16,8 +16,34 @@ const geistMono = Geist_Mono({
 }); 
 
 export const metadata: Metadata = {
-  title: "Sprint Desk",
-  description: "Enterprise multi-tenant sprint and task management SaaS platform",
+  title: {
+    default: "Sprint Desk",
+    template: "%s · Sprint Desk",
+  },
+  description:
+    "Visual Kanban boards for modern teams. Create a workspace, build boards, and drag cards from To Do to Done — free forever.",
+  keywords: [
+    "kanban",
+    "project management",
+    "task tracker",
+    "team collaboration",
+    "workspace",
+    "boards",
+    "drag and drop",
+  ],
+  openGraph: {
+    title: "Sprint Desk — Visual Kanban for every team",
+    description:
+      "Create a workspace, build boards, drag cards from To Do to Done. Free forever, no credit card required.",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sprint Desk — Visual Kanban for every team",
+    description:
+      "Create a workspace, build boards, drag cards from To Do to Done. Free forever.",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

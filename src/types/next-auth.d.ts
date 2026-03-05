@@ -1,16 +1,9 @@
 import "next-auth";
 import "next-auth/jwt";
 
-import type { Role } from "@/types/domain";
-
 declare module "next-auth" {
   interface User {
-    role: Role;
-    companyId?: string | null;
-    departmentId?: string | null;
-    companyName?: string | null;
-    departmentName?: string | null;
-    mustChangePassword?: boolean;
+    avatar?: string | null;
   }
 
   interface Session {
@@ -18,23 +11,13 @@ declare module "next-auth" {
       id: string;
       name?: string | null;
       email?: string | null;
-      role: Role;
-      companyId?: string | null;
-      departmentId?: string | null;
-      companyName?: string | null;
-      departmentName?: string | null;
-      mustChangePassword?: boolean;
+      avatar?: string | null;
     };
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
-    role: Role;
-    companyId?: string | null;
-    departmentId?: string | null;
-    companyName?: string | null;
-    departmentName?: string | null;
-    mustChangePassword?: boolean;
+    avatar?: string | null;
   }
 }

@@ -6,7 +6,7 @@ export function PublicFooter() {
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 md:grid-cols-4">
         <div className="space-y-2">
           <p className="text-sm font-semibold text-foreground">Sprint Desk</p>
-          <p className="text-sm text-muted-foreground">Premium enterprise sprint and task management for multi-tenant teams.</p>
+          <p className="text-sm text-muted-foreground">Collaborative workspace and Kanban board platform for modern teams.</p>
         </div>
 
         <div className="space-y-2 text-sm">
@@ -19,8 +19,8 @@ export function PublicFooter() {
         <div className="space-y-2 text-sm">
           <p className="font-semibold text-foreground">Resources</p>
           <Link href="/contact" className="block text-muted-foreground transition-colors hover:text-primary">Contact</Link>
-          <Link href="/login" className="block text-muted-foreground transition-colors hover:text-primary">Login</Link>
-          <Link href="/register-company" className="block text-muted-foreground transition-colors hover:text-primary">Register Your Company</Link>
+          <Link href="/login" className="block text-muted-foreground transition-colors hover:text-primary">Sign In</Link>
+          <Link href="/register" className="block text-muted-foreground transition-colors hover:text-primary">Create Account</Link>
         </div>
 
         <div className="space-y-2 text-sm">

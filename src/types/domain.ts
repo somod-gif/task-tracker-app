@@ -1,25 +1,43 @@
-export const ROLES = ["PLATFORM_OWNER", "SUPER_ADMIN", "ADMIN", "DEPARTMENT_LEAD", "EMPLOYEE"] as const;
-export type Role = (typeof ROLES)[number];
+// ─── Workspace Roles ────────────────────────────────────────────────────────
+export const WORKSPACE_ROLES = ["OWNER", "ADMIN", "MEMBER"] as const;
+export type WorkspaceRole = (typeof WORKSPACE_ROLES)[number];
 
-export const TASK_STATUSES = ["TODO", "IN_PROGRESS", "DONE"] as const;
-export type TaskStatus = (typeof TASK_STATUSES)[number];
+// ─── Board Visibility ────────────────────────────────────────────────────────
+export const BOARD_VISIBILITIES = ["PRIVATE", "WORKSPACE"] as const;
+export type BoardVisibility = (typeof BOARD_VISIBILITIES)[number];
 
-export const TASK_PRIORITIES = ["LOW", "MEDIUM", "HIGH"] as const;
-export type TaskPriority = (typeof TASK_PRIORITIES)[number];
+// ─── Card Priority ───────────────────────────────────────────────────────────
+export const CARD_PRIORITIES = ["LOW", "MEDIUM", "HIGH", "URGENT"] as const;
+export type CardPriority = (typeof CARD_PRIORITIES)[number];
 
-export const TASK_WORK_TYPES = ["GENERAL", "BACKLOG", "SPRINT"] as const;
-export type TaskWorkType = (typeof TASK_WORK_TYPES)[number];
-
-export const SPRINT_TYPES = ["SPRINT", "BACKLOG"] as const;
-export type SprintType = (typeof SPRINT_TYPES)[number];
-
-export const ACTIVITY_ACTIONS = [
-  "TASK_CREATED",
-  "TASK_ASSIGNED",
-  "TASK_STATUS_UPDATED",
-  "TASK_COMMENT_ADDED",
-  "TASK_SOFT_DELETED",
-  "TASK_OVERDUE",
-  "SPRINT_ASSIGNED",
+// ─── Notification Types ──────────────────────────────────────────────────────
+export const NOTIFICATION_TYPES = [
+  "WORKSPACE_INVITE",
+  "BOARD_ADDED",
+  "CARD_ASSIGNED",
+  "CARD_COMMENT",
+  "DUE_DATE_REMINDER",
+  "SYSTEM",
 ] as const;
-export type ActivityAction = (typeof ACTIVITY_ACTIONS)[number];
+export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
+
+// ─── Permission helpers ──────────────────────────────────────────────────────
+export function canManageWorkspace(role: WorkspaceRole) {
+  return role === "OWNER" || role === "ADMIN";
+}
+
+export function canDeleteWorkspace(role: WorkspaceRole) {
+  return role === "OWNER";
+}
+
+export function canInviteMembers(role: WorkspaceRole) {
+  return role === "OWNER" || role === "ADMIN";
+}
+
+export function canCreateBoards(role: WorkspaceRole) {
+  return role === "OWNER" || role === "ADMIN";
+}
+
+export function canManageMembers(role: WorkspaceRole) {
+  return role === "OWNER" || role === "ADMIN";
+}

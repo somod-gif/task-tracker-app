@@ -172,3 +172,36 @@ export async function sendEmailToUser({
     return;
   }
 }
+
+// ─── Invitation Email ─────────────────────────────────────────────────────────
+export async function sendInvitationEmail({
+  to,
+  inviterName,
+  workspaceName,
+  inviteToken,
+}: {
+  to: string;
+  inviterName: string;
+  workspaceName: string;
+  inviteToken: string;
+}) {
+  try {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+    const inviteLink = `${appUrl}/invite/${inviteToken}`;
+
+    await sendMail({
+      to,
+      subject: `${inviterName} invited you to "${workspaceName}" on Sprint Desk`,
+      text: `You've been invited to join "${workspaceName}" on Sprint Desk. Accept here: ${inviteLink}`,
+      html: buildTemplate({
+        heading: `You're invited to "${workspaceName}"`,
+        message: `<strong>${inviterName}</strong> has invited you to collaborate on <strong>${workspaceName}</strong> in Sprint Desk.`,
+        ctaLabel: "Accept Invitation",
+        ctaLink: inviteLink,
+      }),
+    });
+  } catch {
+    // Email failures are non-blocking
+    return;
+  }
+}
