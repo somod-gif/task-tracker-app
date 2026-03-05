@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import { useEffect, useRef } from "react";
 import { useActionState } from "react";
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { signIn } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
@@ -15,17 +15,14 @@ import { appToast } from "@/lib/toast";
 
 export function LoginForm() {
   const router = useRouter();
+  const formRef = useRef<HTMLFormElement>(null);
 
-  async function handleLogin(_prevState: unknown, formData: FormData) {
-    const email = String(formData.get("email") ?? "");
+  async function handleLogin(_prev: unknown, formData: FormData) {
+    const email    = String(formData.get("email")    ?? "");
     const password = String(formData.get("password") ?? "");
 
     const result = await signIn("credentials", { email, password, redirect: false });
-
-    if (result?.error) {
-      return { success: false, error: "Invalid email or password" };
-    }
-
+    if (result?.error) return { success: false, error: "Invalid email or password" };
     return { success: true, error: "" };
   }
 
@@ -48,13 +45,19 @@ export function LoginForm() {
         <p className="text-center text-sm text-muted-foreground">Sign in to your Sprint Desk account</p>
       </CardHeader>
       <CardContent>
-        <form action={formAction} className="space-y-4">
+        <form ref={formRef} action={formAction} className="space-y-4">
+          <input type="hidden" name="userAgent" value={typeof navigator !== "undefined" ? navigator.userAgent : ""} />
           <div className="space-y-1.5">
             <Label htmlFor="email">Email address</Label>
             <Input id="email" name="email" type="email" placeholder="you@example.com" required autoFocus />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="password">Password</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">Password</Label>
+              <Link href="/forgot-password" className="text-xs text-primary hover:underline">
+                Forgot password?
+              </Link>
+            </div>
             <PasswordInput id="password" name="password" required />
           </div>
           <Button className="h-11 w-full font-semibold text-base" type="submit" disabled={pending}>
@@ -63,12 +66,9 @@ export function LoginForm() {
         </form>
         <p className="mt-4 text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="font-medium text-primary hover:underline">
-            Create one
-          </Link>
+          <Link href="/register" className="font-medium text-primary hover:underline">Create one</Link>
         </p>
       </CardContent>
     </Card>
   );
 }
-

@@ -37,6 +37,7 @@ enum NotificationType {
   CARD_ASSIGNED
   CARD_COMMENT
   DUE_DATE_REMINDER
+  LOGIN
   SYSTEM
 }
 
@@ -61,7 +62,8 @@ model User {
   comments         CardComment[]
   notifications    Notification[]
   sentInvitations  Invitation[]      @relation("InvitationSender")
-  activityLogs     ActivityLog[]
+  activityLogs       ActivityLog[]
+  passwordResetTokens PasswordResetToken[]
 
   @@index([email])
 }
@@ -221,6 +223,20 @@ model Invitation {
 
   @@index([workspaceId])
   @@index([email])
+  @@index([token])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
   @@index([token])
 }
 

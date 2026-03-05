@@ -1,4 +1,6 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 import { LoginForm } from "@/components/auth/login-form";
 import { PublicShell } from "@/components/marketing/public-shell";
@@ -36,7 +38,16 @@ export default async function LoginPage() {
           </div>
         </section>
         <section className="flex items-center justify-center px-4 py-10 sm:px-8">
-          <LoginForm />
+          <div className="w-full max-w-md">
+            <Link
+              href="/"
+              className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="size-3.5" />
+              Back to home
+            </Link>
+            <LoginForm />
+          </div>
         </section>
       </main>
     </PublicShell>

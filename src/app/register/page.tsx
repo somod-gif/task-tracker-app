@@ -1,4 +1,6 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 import { RegisterForm } from "@/components/auth/register-form";
 import { PublicShell } from "@/components/marketing/public-shell";
@@ -36,7 +38,16 @@ export default async function RegisterPage() {
           </div>
         </section>
         <section className="flex items-center justify-center px-4 py-10 sm:px-8">
-          <RegisterForm />
+          <div className="w-full max-w-md">
+            <Link
+              href="/"
+              className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="size-3.5" />
+              Back to home
+            </Link>
+            <RegisterForm />
+          </div>
         </section>
       </main>
     </PublicShell>

@@ -27,9 +27,7 @@ export function InviteMemberDialog({ workspaceId, children, onInvited }: Props) 
       const res = await inviteMemberAction({ workspaceId, email: email.trim(), role });
       if (res.success) {
         appToast.success(
-          res.data && (res.data as { added: boolean }).added
-            ? "Member added to workspace"
-            : "Invitation email sent!"
+          res.added ? "Member added to workspace" : "Invitation email sent!"
         );
         setOpen(false);
         setEmail("");

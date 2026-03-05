@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
-import { useActionState } from "react";
-import { useEffect } from "react";
+import { useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,37 +12,29 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { appToast } from "@/lib/toast";
 import { registerAction } from "@/server/actions/auth-actions";
 
-export function RegisterForm({ inviteToken }: { inviteToken?: string }) {
+export function RegisterForm() {
   const router = useRouter();
-
-  const [state, formAction, pending] = useActionState(registerAction, { success: false, error: "" });
+  const [state, action, pending] = useActionState(registerAction, { success: false, error: "" });
 
   useEffect(() => {
+    if (state.error) appToast.error(state.error);
     if (state.success) {
-      appToast.success("Account created! Please sign in.");
-      if (inviteToken) {
-        router.push(`/invite/${inviteToken}`);
-      } else {
-        router.push("/login");
-      }
-    } else if (state.error) {
-      appToast.error(state.error);
+      appToast.success("Account created! Signing you in…");
+      router.push("/login");
     }
-  }, [state, router, inviteToken]);
+  }, [state, router]);
 
   return (
-    <Card className="w-full max-w-md border border-border/60 bg-card shadow-xl">
+    <Card className="w-full max-w-md border border-border/60 shadow-xl">
       <CardHeader className="space-y-1 pb-4">
-        <CardTitle className="text-center text-3xl font-bold tracking-tight">Create account</CardTitle>
-        <p className="text-center text-sm text-muted-foreground">
-          Start managing projects with Sprint Desk
-        </p>
+        <CardTitle className="text-center text-3xl font-bold tracking-tight">Create your account</CardTitle>
+        <p className="text-center text-sm text-muted-foreground">Free forever. No credit card required.</p>
       </CardHeader>
       <CardContent>
-        <form action={formAction} className="space-y-4">
+        <form action={action} className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="name">Full name</Label>
-            <Input id="name" name="name" type="text" placeholder="Jane Smith" required autoFocus />
+            <Input id="name" name="name" placeholder="Sarah Johnson" required autoFocus />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="email">Email address</Label>
@@ -51,18 +42,16 @@ export function RegisterForm({ inviteToken }: { inviteToken?: string }) {
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="password">Password</Label>
-            <PasswordInput id="password" name="password" required />
-            <p className="text-xs text-muted-foreground">Minimum 8 characters</p>
+            <PasswordInput id="password" name="password" minLength={8} required />
+            <p className="text-xs text-muted-foreground">At least 8 characters</p>
           </div>
           <Button className="h-11 w-full font-semibold text-base" type="submit" disabled={pending}>
-            {pending ? "Creating account…" : "Create account"}
+            {pending ? "Creating account…" : "Create free account"}
           </Button>
         </form>
         <p className="mt-4 text-center text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link href="/login" className="font-medium text-primary hover:underline">
-            Sign in
-          </Link>
+          <Link href="/login" className="font-medium text-primary hover:underline">Sign in</Link>
         </p>
       </CardContent>
     </Card>
