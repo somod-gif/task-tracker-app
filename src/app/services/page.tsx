@@ -14,6 +14,7 @@ import {
   MessageSquare,
   ArrowRight,
 } from "lucide-react";
+import { ReadingProgress } from "@/components/marketing/reading-progress";
 
 const services = [
   {
@@ -61,10 +62,11 @@ const services = [
 export default function ServicesPage() {
   return (
     <PublicShell activePath="/services">
+      <ReadingProgress />
       <main className="mx-auto max-w-5xl px-4 py-14 space-y-12">
 
         {/* Header */}
-        <div className="space-y-4">
+        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-3 duration-500">
           <Badge variant="outline">What we offer</Badge>
           <h1 className="text-4xl font-bold tracking-tight">Platform features</h1>
           <p className="max-w-2xl text-lg text-muted-foreground">
@@ -74,7 +76,7 @@ export default function ServicesPage() {
         </div>
 
         {/* Feature grid */}
-        <div className="grid gap-5 md:grid-cols-2">
+        <div className="grid gap-5 md:grid-cols-2 animate-in fade-in slide-in-from-bottom-3 duration-500">
           {services.map((service) => (
             <Card key={service.title} className="border-border/70 hover:border-primary/40 transition-colors">
               <CardHeader>
@@ -89,7 +91,7 @@ export default function ServicesPage() {
         </div>
 
         {/* CTA */}
-        <Card className="border-primary/30 bg-primary/5">
+        <Card className="border-primary/30 bg-primary/5 animate-in fade-in slide-in-from-bottom-3 duration-500">
           <CardHeader>
             <CardTitle>Start using these features today</CardTitle>
             <CardDescription>Free forever. No credit card required.</CardDescription>

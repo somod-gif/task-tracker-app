@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getAdminSession } from "@/lib/admin/auth";
 import { adminLogoutAction } from "@/server/actions/admin-auth-actions";
 import { LayoutDashboard, Users, Layers, LogOut } from "lucide-react";
+import { BrandLogo } from "@/components/branding/brand-logo";
 
 export default async function AdminProtectedLayout({ children }: { children: React.ReactNode }) {
   const ok = await getAdminSession();
@@ -10,8 +11,11 @@ export default async function AdminProtectedLayout({ children }: { children: Rea
 
   return (
     <div className="flex min-h-screen bg-slate-950">
-      <aside className="w-56 shrink-0 border-r border-slate-800 bg-slate-900 flex flex-col">
-        <div className="p-5 border-b border-slate-800">
+      <aside className="flex w-64 shrink-0 flex-col border-r border-slate-800 bg-slate-900">
+        <div className="border-b border-slate-800 p-5">
+          <div className="mb-2 flex justify-center">
+            <BrandLogo />
+          </div>
           <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Sprint Desk</p>
           <p className="text-white font-semibold text-sm mt-0.5">Admin</p>
         </div>

@@ -20,6 +20,19 @@ export const metadata: Metadata = {
     default: "Sprint Desk",
     template: "%s · Sprint Desk",
   },
+  icons: {
+    icon: [
+      { url: "/sprint-desk.png", sizes: "16x16", type: "image/png" },
+      { url: "/sprint-desk.png", sizes: "32x32", type: "image/png" },
+      { url: "/sprint-desk.png", sizes: "64x64", type: "image/png" },
+      { url: "/sprint-desk.png", sizes: "128x128", type: "image/png" },
+      { url: "/sprint-desk.png", sizes: "256x256", type: "image/png" },
+      { url: "/sprint-desk.png", sizes: "512x512", type: "image/png" },
+      { url: "/sprint-desk.png", sizes: "1024x1024", type: "image/png" },
+    ],
+    apple: "/sprint-desk.png",
+    shortcut: "/sprint-desk.png",
+  },
   description:
     "Visual Kanban boards for modern teams. Create a workspace, build boards, and drag cards from To Do to Done — free forever.",
   keywords: [

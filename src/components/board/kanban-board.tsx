@@ -179,7 +179,7 @@ export function KanbanBoard({ board, workspaceId, currentUserId, workspaceMember
                     <div
                       ref={provided.innerRef}
                       {...provided.draggableProps}
-                      className={`flex w-72 shrink-0 flex-col rounded-xl bg-muted/60 border border-border/50 max-h-[calc(100vh-140px)] ${
+                      className={`flex max-h-[calc(100vh-140px)] w-72 shrink-0 flex-col rounded-2xl border border-border/60 bg-card shadow-sm ${
                         snapshot.isDragging ? "shadow-xl ring-2 ring-primary/30 rotate-1" : ""
                       }`}
                     >
@@ -229,7 +229,7 @@ export function KanbanBoard({ board, workspaceId, currentUserId, workspaceMember
                             ref={provided.innerRef}
                             {...provided.droppableProps}
                             className={`flex-1 space-y-2 overflow-y-auto px-3 pb-2 min-h-[2px] ${
-                              snapshot.isDraggingOver ? "bg-primary/5 rounded-lg" : ""
+                              snapshot.isDraggingOver ? "rounded-xl bg-primary/5" : ""
                             }`}
                           >
                             {list.cards.map((card, cardIndex) => (
@@ -299,7 +299,7 @@ export function KanbanBoard({ board, workspaceId, currentUserId, workspaceMember
                               setAddingCardListId(list.id);
                               setNewCardTitle("");
                             }}
-                            className="flex w-full items-center gap-1.5 rounded-lg p-2 text-sm text-muted-foreground hover:bg-background hover:text-foreground transition-colors"
+                            className="flex w-full items-center gap-1.5 rounded-lg p-2 text-sm text-muted-foreground transition-colors hover:bg-primary/5 hover:text-primary"
                           >
                             <Plus className="h-4 w-4" />
                             Add a card
@@ -315,7 +315,7 @@ export function KanbanBoard({ board, workspaceId, currentUserId, workspaceMember
               {/* Add List */}
               <div className="w-72 shrink-0">
                 {showAddList ? (
-                  <div className="rounded-xl bg-muted/60 border border-border/50 p-3 space-y-2">
+                  <div className="space-y-2 rounded-2xl border border-border/60 bg-card p-3 shadow-sm">
                     <Input
                       placeholder="List title…"
                       value={addingListTitle}
@@ -349,7 +349,7 @@ export function KanbanBoard({ board, workspaceId, currentUserId, workspaceMember
                 ) : (
                   <button
                     onClick={() => setShowAddList(true)}
-                    className="flex w-full items-center gap-2 rounded-xl bg-background/60 border border-border/40 p-3 text-sm text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors"
+                    className="flex w-full items-center gap-2 rounded-2xl border border-dashed border-border/60 bg-card p-3 text-sm text-muted-foreground shadow-sm transition-colors hover:border-primary/60 hover:bg-primary/5 hover:text-primary"
                   >
                     <Plus className="h-4 w-4" />
                     Add a list

@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PublicShell } from "@/components/marketing/public-shell";
+import { ReadingProgress } from "@/components/marketing/reading-progress";
 
 const quotes = [
   {
@@ -17,9 +18,10 @@ const quotes = [
 export default function TestimonialsPage() {
   return (
     <PublicShell activePath="/testimonials">
+      <ReadingProgress />
       <main className="mx-auto max-w-5xl space-y-6 px-4 py-10">
-        <h1 className="text-3xl font-bold tracking-tight">Testimonials</h1>
-        <div className="grid gap-4 md:grid-cols-2">
+        <h1 className="animate-in fade-in slide-in-from-bottom-3 text-3xl font-bold tracking-tight duration-500">Testimonials</h1>
+        <div className="grid gap-4 animate-in fade-in slide-in-from-bottom-3 duration-500 md:grid-cols-2">
           {quotes.map((item) => (
             <Card key={item.author}>
               <CardHeader>
@@ -30,7 +32,7 @@ export default function TestimonialsPage() {
             </Card>
           ))}
         </div>
-        <Card>
+        <Card className="animate-in fade-in slide-in-from-bottom-3 duration-500">
           <CardHeader>
             <CardTitle>Ratings & Trust</CardTitle>
           </CardHeader>

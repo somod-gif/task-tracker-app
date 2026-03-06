@@ -34,7 +34,7 @@ export function AcceptInviteClient({ token, workspaceName, workspaceId, inviterN
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#262166]/5 to-[#1593c6]/5 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10 p-4">
       <div className="w-full max-w-md rounded-2xl border bg-card p-8 shadow-lg text-center space-y-5">
         <div className="flex h-16 w-16 mx-auto items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
           {workspaceName.charAt(0).toUpperCase()}
@@ -49,8 +49,8 @@ export function AcceptInviteClient({ token, workspaceName, workspaceId, inviterN
         </div>
 
         {emailMismatch && (
-          <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-left">
-            <p className="text-sm text-amber-700">
+          <div className="rounded-lg border border-accent/30 bg-accent/10 px-4 py-3 text-left">
+            <p className="text-sm text-foreground">
               This invitation was sent to <strong>{invitedEmail}</strong> but you&apos;re signed in as{" "}
               <strong>{currentUserEmail}</strong>. You can still accept, but make sure this is the right account.
             </p>

@@ -8,7 +8,6 @@ import { prisma } from "@/lib/prisma";
 import { requireWorkspaceMember } from "@/lib/rbac";
 import { sendInvitationEmail, sendWorkspaceInviteEmail } from "@/lib/email/mailer";
 import type { WorkspaceRole } from "@/types/domain";
-import { emitNotification } from "@/lib/socket";
 
 const inviteSchema = z.object({
   workspaceId: z.string().cuid(),
@@ -44,23 +43,18 @@ export async function inviteMemberAction(input: z.infer<typeof inviteSchema>) {
       data: { userId: existingUser.id, workspaceId: parsed.data.workspaceId, role: parsed.data.role as WorkspaceRole },
     });
 
-    const inviterName = user.name ?? "A team member";
-
-    const notif = await prisma.notification.create({
+    await prisma.notification.create({
       data: {
         userId: existingUser.id,
         workspaceId: parsed.data.workspaceId,
         type: "WORKSPACE_INVITE",
         title: "You were added to a workspace",
-        message: `${user.name} added you to "${workspace.name}"`,
+        message: `${user.name ?? "A team member"} added you to "${workspace.name}"`,
         link: `/workspace/${parsed.data.workspaceId}`,
       },
-    });
-    await emitNotification(existingUser.id, {
-      id: notif.id, userId: existingUser.id, workspaceId: parsed.data.workspaceId,
-      type: "WORKSPACE_INVITE", title: notif.title, message: notif.message,
-      isRead: false, link: notif.link, createdAt: notif.createdAt.toISOString(),
-    });
+    }).catch(() => {});
+
+    const inviterName = user.name ?? "A team member";
 
     // Email existing user
     sendWorkspaceInviteEmail({

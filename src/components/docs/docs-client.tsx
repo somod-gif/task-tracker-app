@@ -167,7 +167,13 @@ function MobileNav({
 }
 
 /* ─── Main component ────────────────────────────────────────────────────── */
-export function DocsClient() {
+export function DocsClient({
+  canCreateDocs,
+  docsRole,
+}: {
+  canCreateDocs: boolean;
+  docsRole: "PLATFORM_OWNER" | "ADMIN" | "USER";
+}) {
   const [activeId, setActiveId] = useState("overview");
   const [search, setSearch] = useState("");
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -217,10 +223,21 @@ export function DocsClient() {
 
         {/* Page header */}
         <div className="mb-10 space-y-3">
-          <Badge variant="outline" className="gap-1">
-            <BookOpen className="size-3" />
-            Documentation
-          </Badge>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <Badge variant="outline" className="gap-1">
+              <BookOpen className="size-3" />
+              Documentation
+            </Badge>
+            {canCreateDocs ? (
+              <Button size="sm" asChild>
+                <Link href="/admin">Create documentation</Link>
+              </Button>
+            ) : (
+              <Badge variant="secondary" className="text-xs">
+                Role: {docsRole}
+              </Badge>
+            )}
+          </div>
           <h1 className="text-4xl font-bold tracking-tight">Sprint Desk Docs</h1>
           <p className="max-w-2xl text-lg text-muted-foreground">
             Everything you need to understand, use, and get the most out of Sprint Desk —
@@ -532,7 +549,7 @@ export function DocsClient() {
               <div className="grid gap-4 sm:grid-cols-2">
                 {[
                   { icon: Flag,           title: "Priority",          desc: "Set Low, Medium, High, or Urgent. The badge appears on the card tile in colour." },
-                  { icon: CheckCircle2,   title: "Due Date",          desc: "Attach a deadline. Approaching due dates trigger automatic notifications to all assignees." },
+                  { icon: CheckCircle2,   title: "Due Date",          desc: "Attach a deadline so teams can track delivery commitments clearly." },
                   { icon: Users,          title: "Assignees",         desc: "Assign one or more workspace members. They are notified immediately." },
                   { icon: MessageSquare,  title: "Comments",          desc: "Threaded comments with timestamps — for status updates, questions, or decisions." },
                   { icon: Zap,            title: "Activity Log",      desc: "Auto-recorded audit trail: every move, priority change, assignment, and edit — permanent." },
@@ -572,16 +589,17 @@ export function DocsClient() {
             {/* ── NOTIFICATIONS ─────────────────────────────────────── */}
             <Section id="notifications" title="Notifications" icon={Bell}>
               <p className="text-muted-foreground leading-relaxed">
-                The <strong className="text-foreground">bell icon</strong> in the top navigation shows
-                your live unread notification count — no page refresh needed.
+                Sprint Desk includes a dedicated <strong className="text-foreground">Notifications Center</strong> at
+                <code className="mx-1 rounded bg-muted px-1.5 py-0.5 text-sm">/workspace/notifications</code>.
+                Use the sidebar bell icon to open it quickly and monitor activity.
               </p>
 
               <div className="grid gap-3 sm:grid-cols-2">
                 {[
-                  "You are assigned to a card",
-                  "Someone comments on a card you are on",
-                  "A card's due date is approaching",
-                  "You are invited to or removed from a workspace",
+                  "Card assignment notifications",
+                  "Card comment notifications",
+                  "Workspace invitation notifications",
+                  "Login activity notifications",
                 ].map((trigger) => (
                   <div key={trigger} className="flex items-start gap-3 rounded-xl border border-border/60 bg-card/50 p-4">
                     <Bell className="mt-0.5 size-4 shrink-0 text-primary" />
@@ -591,12 +609,13 @@ export function DocsClient() {
               </div>
 
               <div className="rounded-xl border border-border/60 bg-card/50 p-5">
-                <h3 className="mb-3 font-semibold">Managing Notifications</h3>
+                <h3 className="mb-3 font-semibold">Managing notifications</h3>
                 <ul className="space-y-1.5">
                   {[
-                    "Click the bell to open the notification panel",
-                    "Mark individual notifications as read, or clear all at once",
-                    "Each notification links directly to the relevant card or workspace",
+                    "Unread count appears beside the sidebar bell icon",
+                    "Open any notification directly from the center",
+                    "Mark individual notifications as read",
+                    "Mark all notifications as read in one click",
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
                       <ChevronRight className="mt-0.5 size-3.5 shrink-0 text-primary" />
@@ -698,7 +717,7 @@ export function DocsClient() {
                     { step: "06", title: "Create Board \"Website Launch\"", desc: "Board is seeded with To Do, In Progress, and Done lists." },
                     { step: "07", title: "Add cards to To Do",             desc: "\"Write homepage copy\", \"Design mockups\", \"Set up hosting\"." },
                     { step: "08", title: "Open a card and fill in details", desc: "Set priority: High, due date: March 10, assign to Sarah." },
-                    { step: "09", title: "Sarah gets a notification",      desc: "\"You have been assigned to Write homepage copy.\"" },
+                    { step: "09", title: "Sarah sees the assignment on board", desc: "The task appears under assigned work and is visible immediately." },
                     { step: "10", title: "Sarah drags card to In Progress", desc: "Board updates live for all workspace members." },
                     { step: "11", title: "Sarah finishes",                 desc: "Drags card to Done, adds comment: \"Copy approved by client.\"" },
                     { step: "12", title: "Activity log records everything", desc: "Who moved it, when, from which list to which — permanent audit trail." },

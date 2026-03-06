@@ -38,3 +38,7 @@ export function canCreateBoards(role: string): boolean {
 export function canManageMembers(role: string): boolean {
   return role === "OWNER" || role === "ADMIN";
 }
+
+export function canCreateDocs(role: string): boolean {
+  return role === "PLATFORM_OWNER" || role === "ADMIN";
+}

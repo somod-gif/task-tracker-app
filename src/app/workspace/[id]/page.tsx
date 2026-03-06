@@ -30,12 +30,13 @@ export default async function WorkspacePage({ params }: Props) {
   const isManager = membership.role === "OWNER" || membership.role === "ADMIN";
 
   const BOARD_COLORS = [
-    "from-[#1593c6] to-[#0f7ab8]",
-    "from-[#262166] to-[#1a1560]",
+    "from-primary to-secondary",
+    "from-secondary to-primary",
+    "from-accent to-primary",
     "from-emerald-500 to-emerald-600",
     "from-rose-500 to-rose-600",
     "from-amber-500 to-amber-600",
-    "from-purple-500 to-purple-600",
+    "from-indigo-500 to-violet-600",
   ];
 
   return (
@@ -96,7 +97,7 @@ export default async function WorkspacePage({ params }: Props) {
             return (
               <Link key={board.id} href={`/workspace/${workspaceId}/board/${board.id}`}>
                 <div
-                  className={`group relative h-32 cursor-pointer overflow-hidden rounded-xl bg-gradient-to-br ${gradient} transition-all hover:shadow-lg hover:-translate-y-0.5`}
+                  className={`group relative h-32 cursor-pointer overflow-hidden rounded-2xl bg-gradient-to-br ${gradient} shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-xl`}
                   style={board.coverColor ? { backgroundColor: board.coverColor } : {}}
                 >
                   <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors" />
@@ -124,7 +125,7 @@ export default async function WorkspacePage({ params }: Props) {
           {/* Create new board tile */}
           {isManager && (
             <CreateBoardDialog workspaceId={workspaceId}>
-              <button className="flex h-32 cursor-pointer items-center justify-center rounded-xl border-2 border-dashed border-border/60 text-muted-foreground hover:border-primary hover:text-primary transition-colors">
+              <button className="flex h-32 cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed border-border/60 text-muted-foreground transition-colors hover:border-primary hover:bg-primary/5 hover:text-primary">
                 <div className="text-center">
                   <Plus className="mx-auto h-6 w-6" />
                   <p className="mt-1 text-sm font-medium">Create board</p>

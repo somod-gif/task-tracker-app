@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getAdminSession, adminEnabled } from "@/lib/admin/auth";
 import { AdminLoginForm } from "@/components/admin/admin-login-form";
+import { BrandLogo } from "@/components/branding/brand-logo";
 
 export default async function AdminLoginPage() {
   if (!adminEnabled()) {
@@ -21,6 +22,9 @@ export default async function AdminLoginPage() {
     <main className="flex min-h-screen items-center justify-center bg-slate-950">
       <div className="w-full max-w-sm px-4">
         <div className="mb-8 text-center">
+          <div className="mb-3 flex justify-center">
+            <BrandLogo />
+          </div>
           <h1 className="text-3xl font-bold text-white">Sprint Desk</h1>
           <p className="mt-1 text-sm text-slate-400">Admin Dashboard</p>
         </div>

@@ -3,7 +3,7 @@
  * All transactional emails sent via Nodemailer (SMTP).
  */
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+const BASE_URL = process.env.BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "https://sprintdesk.com";
 const P = "#262166"; // brand primary
 const A = "#1593c6"; // brand accent
 
@@ -70,7 +70,7 @@ export async function sendWelcomeEmail({ to, name }: { to: string; name: string 
         <li>Build a <strong>board</strong> and add cards</li>
         <li>Drag cards from <em>To Do</em> to <em>Done</em></li>
       </ol>` +
-      cta("Open Sprint Desk", `${APP_URL}/workspace`) +
+      cta("Open Sprint Desk", `${BASE_URL}/workspace`) +
       hr() +
       `<p style="margin:0;font-size:12px;color:#9aa5b4;">Account email: <strong>${to}</strong></p>`
     ),
@@ -91,7 +91,7 @@ export async function sendLoginNotificationEmail({
       p(`Hi <strong>${name}</strong>, a sign-in to your Sprint Desk account was just recorded.`) +
       tbl(row("Account", to) + row("Time", time) + row("Device", userAgent ? userAgent.slice(0, 80) : "Unknown")) +
       warn("<strong>Wasn&apos;t you?</strong> Change your password immediately.") +
-      cta("Change My Password", `${APP_URL}/forgot-password`)
+      cta("Change My Password", `${BASE_URL}/forgot-password`)
     ),
   });
 }
@@ -99,7 +99,7 @@ export async function sendLoginNotificationEmail({
 export async function sendPasswordResetEmail({
   to, name, resetToken,
 }: { to: string; name: string; resetToken: string }) {
-  const link = `${APP_URL}/reset-password?token=${resetToken}`;
+  const link = `${BASE_URL}/reset-password?token=${resetToken}`;
   await send({
     to, subject: "Reset Your Sprint Desk Password",
     html: wrap(
@@ -123,7 +123,7 @@ export async function sendWorkspaceInviteEmail({
     html: wrap(
       h2("You have been added to a workspace") +
       p(`<strong>${inviterName}</strong> added you to <strong>"${workspaceName}"</strong> on Sprint Desk.`) +
-      cta(`Open "${workspaceName}"`, `${APP_URL}/workspace/${workspaceId}`)
+      cta(`Open "${workspaceName}"`, `${BASE_URL}/workspace/${workspaceId}`)
     ),
   });
 }
@@ -131,7 +131,7 @@ export async function sendWorkspaceInviteEmail({
 export async function sendInvitationEmail({
   to, inviterName, workspaceName, inviteToken,
 }: { to: string; inviterName: string; workspaceName: string; inviteToken: string }) {
-  const link = `${APP_URL}/invite/${inviteToken}`;
+  const link = `${BASE_URL}/invite/accept?token=${inviteToken}`;
   await send({
     to, subject: `${inviterName} invited you to "${workspaceName}" on Sprint Desk`,
     html: wrap(
@@ -162,12 +162,13 @@ export async function sendCardAssignedEmail({
 export async function sendEmailToUser({
   userId, type: _type, title, message,
 }: { userId: string; type: string; title: string; message: string }) {
+  void _type;
   const { prisma } = await import("@/lib/prisma");
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
   if (!user?.email) return;
   await send({
     to: user.email,
     subject: `[Sprint Desk] ${title}`,
-    html: wrap(h2(title) + p(message) + cta("Open Sprint Desk", `${APP_URL}/workspace`)),
+    html: wrap(h2(title) + p(message) + cta("Open Sprint Desk", `${BASE_URL}/workspace`)),
   });
 }

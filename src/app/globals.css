@@ -7,6 +7,13 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-sprintdesk-primary: var(--sprintdesk-primary);
+  --color-sprintdesk-secondary: var(--sprintdesk-secondary);
+  --color-sprintdesk-accent: var(--sprintdesk-accent);
+  --color-sprintdesk-highlight: var(--sprintdesk-highlight);
+  --color-sprintdesk-white: var(--sprintdesk-white);
+  --color-sprintdesk-bg: var(--sprintdesk-bg);
+  --color-sprintdesk-border: var(--sprintdesk-border);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --color-ring: var(--ring);
@@ -31,49 +38,53 @@
 }
 
 :root {
-  --brand-primary: #262166;
-  --brand-secondary: #1593c6;
-  --brand-neutral: #8f99a3;
+  --sprintdesk-primary: #0178d3;
+  --sprintdesk-secondary: #058be2;
+  --sprintdesk-accent: #14a1ef;
+  --sprintdesk-highlight: #1bb9f5;
+  --sprintdesk-white: #ffffff;
+  --sprintdesk-bg: #f7fafc;
+  --sprintdesk-border: #e5e7eb;
   --radius: 0.625rem;
-  --background: color-mix(in srgb, white 94%, var(--brand-secondary) 6%);
-  --foreground: color-mix(in srgb, black 10%, var(--brand-primary) 90%);
-  --card: color-mix(in srgb, white 97%, var(--brand-primary) 3%);
+  --background: var(--sprintdesk-bg);
+  --foreground: #0f172a;
+  --card: var(--sprintdesk-white);
   --card-foreground: var(--foreground);
   --popover: var(--card);
   --popover-foreground: var(--foreground);
-  --primary: var(--brand-primary);
-  --primary-foreground: white;
-  --secondary: color-mix(in srgb, white 86%, var(--brand-secondary) 14%);
-  --secondary-foreground: var(--brand-primary);
-  --muted: color-mix(in srgb, white 88%, var(--brand-neutral) 12%);
-  --muted-foreground: color-mix(in srgb, var(--brand-neutral) 70%, var(--brand-primary) 30%);
-  --accent: color-mix(in srgb, white 84%, var(--brand-secondary) 16%);
-  --accent-foreground: var(--brand-primary);
-  --destructive: var(--brand-secondary);
-  --border: color-mix(in srgb, white 70%, var(--brand-neutral) 30%);
-  --input: color-mix(in srgb, white 76%, var(--brand-neutral) 24%);
-  --ring: var(--brand-secondary);
+  --primary: var(--sprintdesk-primary);
+  --primary-foreground: var(--sprintdesk-white);
+  --secondary: #eaf6ff;
+  --secondary-foreground: var(--sprintdesk-primary);
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #e6f5fe;
+  --accent-foreground: var(--sprintdesk-primary);
+  --destructive: #ef4444;
+  --border: var(--sprintdesk-border);
+  --input: var(--sprintdesk-border);
+  --ring: var(--sprintdesk-secondary);
 }
 
 .dark {
-  --background: color-mix(in srgb, black 72%, var(--brand-primary) 28%);
-  --foreground: color-mix(in srgb, white 88%, var(--brand-secondary) 12%);
-  --card: color-mix(in srgb, black 64%, var(--brand-primary) 36%);
+  --background: #0b1220;
+  --foreground: #e2e8f0;
+  --card: #111b2f;
   --card-foreground: var(--foreground);
   --popover: var(--card);
   --popover-foreground: var(--foreground);
-  --primary: color-mix(in srgb, white 72%, var(--brand-secondary) 28%);
-  --primary-foreground: var(--brand-primary);
-  --secondary: color-mix(in srgb, black 52%, var(--brand-secondary) 48%);
-  --secondary-foreground: white;
-  --muted: color-mix(in srgb, black 56%, var(--brand-neutral) 44%);
-  --muted-foreground: color-mix(in srgb, white 70%, var(--brand-neutral) 30%);
-  --accent: color-mix(in srgb, black 46%, var(--brand-secondary) 54%);
-  --accent-foreground: white;
-  --destructive: var(--brand-secondary);
-  --border: color-mix(in srgb, black 55%, var(--brand-neutral) 45%);
-  --input: color-mix(in srgb, black 42%, var(--brand-neutral) 58%);
-  --ring: var(--brand-secondary);
+  --primary: var(--sprintdesk-highlight);
+  --primary-foreground: #071325;
+  --secondary: #18314d;
+  --secondary-foreground: #dbeafe;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --accent: #1b3656;
+  --accent-foreground: #dbeafe;
+  --destructive: #f87171;
+  --border: #334155;
+  --input: #334155;
+  --ring: var(--sprintdesk-highlight);
 }
 
 @layer base {
@@ -82,11 +93,17 @@
   }
   body {
     @apply bg-background text-foreground;
-    background-image: radial-gradient(circle at 15% -10%, color-mix(in srgb, var(--brand-secondary) 18%, transparent 82%), transparent 38%);
+    background-image: radial-gradient(circle at 15% -10%, color-mix(in srgb, var(--sprintdesk-highlight) 14%, transparent 86%), transparent 40%);
   }
 
   a,
   button {
     @apply transition-all duration-200;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  summary {
+    @apply cursor-pointer;
   }
 }

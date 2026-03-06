@@ -12,7 +12,7 @@ import { appToast } from "@/lib/toast";
 import { forgotPasswordAction } from "@/server/actions/auth-actions";
 
 export function ForgotPasswordForm() {
-  const [state, action, pending] = useActionState(forgotPasswordAction, { success: false, error: "" });
+  const [state, action, pending] = useActionState(forgotPasswordAction, { success: false, error: "", email: "" });
 
   useEffect(() => {
     if (state.error) appToast.error(state.error);
@@ -27,7 +27,9 @@ export function ForgotPasswordForm() {
           </div>
           <h2 className="text-xl font-bold">Check your inbox</h2>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            If that email address is registered, you will receive a password reset link within a few minutes.
+            If that email address is registered, a password reset link has been sent to <span className="font-medium text-foreground">{state.email}</span>.
+          </p>
+          <p className="text-sm text-muted-foreground leading-relaxed">
             The link expires in 1 hour.
           </p>
           <Link href="/login" className="inline-flex items-center gap-1 text-sm text-primary hover:underline font-medium">

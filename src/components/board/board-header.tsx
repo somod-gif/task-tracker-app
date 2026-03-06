@@ -18,7 +18,7 @@ type Props = {
 export function BoardHeader({ board, workspaceId, members, canManage, onInvite }: Props) {
   return (
     <div
-      className="sticky top-0 z-10 flex items-center gap-3 border-b bg-background/90 px-4 py-3 backdrop-blur-sm"
+      className="sticky top-0 z-10 flex items-center gap-3 border-b bg-gradient-to-r from-background to-primary/5 px-4 py-3 backdrop-blur-sm"
       style={board.coverColor ? { borderBottomColor: board.coverColor + "60" } : undefined}
     >
       {/* Back */}
@@ -40,7 +40,7 @@ export function BoardHeader({ board, workspaceId, members, canManage, onInvite }
         )}
         <h1 className="text-base font-semibold">{board.title}</h1>
         <span
-          className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] text-muted-foreground"
+          className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[11px] text-primary"
           title={board.visibility === "PRIVATE" ? "Only members can view" : "Visible to workspace members"}
         >
           {board.visibility === "PRIVATE" ? <Lock className="h-3 w-3" /> : <Globe className="h-3 w-3" />}

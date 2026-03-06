@@ -6,7 +6,6 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireWorkspaceMember } from "@/lib/rbac";
 import type { CardPriority } from "@/types/domain";
-import { emitNotification } from "@/lib/socket";
 
 // ─── Create Card ───────────────────────────────────────────────────────────────
 export async function createCardAction(
@@ -142,14 +141,13 @@ export async function assignMemberToCardAction(
     update: {},
   });
 
-  // Notify target user
   const card = await prisma.card.findUnique({
     where: { id: cardId },
     select: { title: true, list: { select: { board: { select: { id: true, title: true } } } } },
   });
 
   if (card && targetUserId !== user.id) {
-    const notification = await prisma.notification.create({
+    await prisma.notification.create({
       data: {
         userId: targetUserId,
         workspaceId,
@@ -158,19 +156,7 @@ export async function assignMemberToCardAction(
         message: `You were assigned to "${card.title}" on board "${card.list.board.title}"`,
         link: `/workspace/${workspaceId}/board/${card.list.board.id}`,
       },
-    });
-
-    await emitNotification(targetUserId, {
-      id: notification.id,
-      userId: targetUserId,
-      workspaceId,
-      type: "CARD_ASSIGNED",
-      title: notification.title,
-      message: notification.message,
-      isRead: false,
-      link: notification.link,
-      createdAt: notification.createdAt.toISOString(),
-    });
+    }).catch(() => {});
   }
 
   revalidatePath(`/workspace/${workspaceId}/board/${card?.list.board.id ?? ""}`);
@@ -207,7 +193,6 @@ export async function addCardCommentAction(
     include: { user: { select: { id: true, name: true, avatar: true } } },
   });
 
-  // Notify card assignees (except commenter)
   const card = await prisma.card.findUnique({
     where: { id: cardId },
     select: {
@@ -223,28 +208,16 @@ export async function addCardCommentAction(
     );
 
     for (const uid of uniqueUserIds) {
-      const notification = await prisma.notification.create({
+      await prisma.notification.create({
         data: {
           userId: uid,
           workspaceId,
           type: "CARD_COMMENT",
           title: "New comment on your card",
-          message: `${user.name} commented on "${card.title}"`,
+          message: `${user.name ?? "A teammate"} commented on "${card.title}"`,
           link: `/workspace/${workspaceId}/board/${card.list.board.id}`,
         },
-      });
-
-      await emitNotification(uid, {
-        id: notification.id,
-        userId: uid,
-        workspaceId,
-        type: "CARD_COMMENT",
-        title: notification.title,
-        message: notification.message,
-        isRead: false,
-        link: notification.link,
-        createdAt: notification.createdAt.toISOString(),
-      });
+      }).catch(() => {});
     }
   }
 

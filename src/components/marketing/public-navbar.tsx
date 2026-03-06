@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
+import { BrandLogo } from "@/components/branding/brand-logo";
 
 const links = [
   { href: "/", label: "Home" },
@@ -52,25 +52,14 @@ export function PublicNavbar({ activePath }: { activePath: string }) {
           : "bg-transparent"
       }`}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 lg:px-6">
+      <div className="mx-auto flex h-28 max-w-7xl items-center justify-between px-4 lg:px-6">
         {/* Logo */}
-        <Link 
-          href="/" 
-          className="group relative inline-flex items-center gap-2 transition-transform hover:scale-105"
-          aria-label="Sprint Desk Home"
-        >
-          <Image 
-            src="/sprint-desk-logo.png" 
-            alt="Sprint Desk" 
-            width={120} 
-            height={40} 
-            className="h-8 w-auto lg:h-10"
-            priority
-          />
+        <div className="group relative inline-flex items-center">
+          <BrandLogo priority />
           <span className="absolute -bottom-6 left-0 text-xs font-medium text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
             Go to homepage
           </span>
-        </Link>
+        </div>
 
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-1 md:flex" aria-label="Main navigation">
@@ -101,7 +90,7 @@ export function PublicNavbar({ activePath }: { activePath: string }) {
         {/* Mobile Menu Button */}
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="relative z-50 flex h-10 w-10 items-center justify-center rounded-lg border bg-background md:hidden"
+          className="relative z-50 flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border bg-background md:hidden"
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           aria-expanded={isMenuOpen}
         >
@@ -147,7 +136,7 @@ export function PublicNavbar({ activePath }: { activePath: string }) {
             <span className="text-sm font-semibold">Menu</span>
             <button
               onClick={() => setIsMenuOpen(false)}
-              className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-secondary"
+              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg hover:bg-secondary"
               aria-label="Close menu"
             >
               <div className="relative h-4 w-4">

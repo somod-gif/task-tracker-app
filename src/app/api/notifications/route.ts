@@ -14,9 +14,10 @@ export async function GET() {
       }),
       prisma.notification.count({ where: { userId: user.id, isRead: false } }),
     ]);
+
     return NextResponse.json({ items, unread });
   } catch {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ items: [], unread: 0, error: "Unauthorized" }, { status: 401 });
   }
 }
 

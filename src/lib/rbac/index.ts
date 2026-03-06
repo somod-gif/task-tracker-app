@@ -8,6 +8,7 @@ export {
   canInviteMembers,
   canCreateBoards,
   canManageMembers,
+  canCreateDocs,
 } from "@/lib/rbac/paths";
 
 export async function requireWorkspaceMember(

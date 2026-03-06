@@ -52,6 +52,10 @@ export function ResetPasswordForm({ token }: { token: string }) {
             <PasswordInput id="password" name="password" minLength={8} required autoFocus />
             <p className="text-xs text-muted-foreground">At least 8 characters</p>
           </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="confirmPassword">Confirm new password</Label>
+            <PasswordInput id="confirmPassword" name="confirmPassword" minLength={8} required />
+          </div>
           <Button className="w-full h-11 font-semibold" type="submit" disabled={pending}>
             {pending ? "Updating…" : "Update password"}
           </Button>

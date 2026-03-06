@@ -17,6 +17,7 @@ export const NOTIFICATION_TYPES = [
   "CARD_ASSIGNED",
   "CARD_COMMENT",
   "DUE_DATE_REMINDER",
+  "LOGIN",
   "SYSTEM",
 ] as const;
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];

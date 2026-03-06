@@ -11,8 +11,8 @@ import { appToast } from "@/lib/toast";
 import { useRouter } from "next/navigation";
 
 const COVER_COLORS = [
-  "#262166", "#1593c6", "#0f766e", "#9333ea", "#dc2626",
-  "#d97706", "#16a34a", "#0284c7", "#7c3aed", "#db2777",
+  "#0178D3", "#058BE2", "#14A1EF", "#1BB9F5", "#0f766e",
+  "#9333ea", "#dc2626", "#d97706", "#16a34a", "#7c3aed",
 ];
 
 type Props = {
@@ -97,7 +97,7 @@ export function CreateBoardDialog({ workspaceId, children }: Props) {
                   onClick={() => setVisibility(v)}
                   className={`flex-1 rounded-md border py-1.5 text-sm transition-colors ${
                     visibility === v
-                      ? "border-primary bg-primary/5 text-primary font-medium"
+                      ? "border-primary bg-primary/10 text-primary font-medium"
                       : "border-border text-muted-foreground hover:border-primary/50"
                   }`}
                 >
@@ -117,7 +117,7 @@ export function CreateBoardDialog({ workspaceId, children }: Props) {
                   type="button"
                   onClick={() => setCoverColor(c)}
                   className={`h-7 w-7 rounded-full transition-transform hover:scale-110 ${
-                    coverColor === c ? "ring-2 ring-offset-2 ring-foreground scale-110" : ""
+                    coverColor === c ? "ring-2 ring-offset-2 ring-primary scale-110" : ""
                   }`}
                   style={{ backgroundColor: c }}
                 />

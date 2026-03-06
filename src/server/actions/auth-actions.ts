@@ -88,7 +88,6 @@ export async function loginAction(_prev: unknown, formData: FormData) {
   // Fetch user for notification email
   const user = await prisma.user.findUnique({ where: { email: email.toLowerCase().trim() }, select: { id: true, name: true, email: true } });
   if (user) {
-    // Create in-app login notification
     await prisma.notification.create({
       data: {
         userId: user.id,
@@ -96,7 +95,8 @@ export async function loginAction(_prev: unknown, formData: FormData) {
         title: "New sign-in to your account",
         message: `A sign-in was recorded for ${user.email}`,
       },
-    });
+    }).catch(() => {});
+
     // Login email (non-blocking)
     sendLoginNotificationEmail({
       to: user.email,
@@ -114,7 +114,7 @@ const forgotSchema = z.object({ email: z.string().email() });
 
 export async function forgotPasswordAction(_prev: unknown, formData: FormData) {
   const parsed = forgotSchema.safeParse({ email: formData.get("email") });
-  if (!parsed.success) return { success: false, error: "Enter a valid email address" };
+  if (!parsed.success) return { success: false, error: "Enter a valid email address", email: "" };
 
   const email = parsed.data.email.toLowerCase().trim();
 
@@ -131,26 +131,32 @@ export async function forgotPasswordAction(_prev: unknown, formData: FormData) {
     sendPasswordResetEmail({ to: user.email, name: user.name, resetToken: token }).catch(() => {});
   }
 
-  return { success: true, error: "" };
+  return { success: true, error: "", email };
 }
 
 // ─── Reset Password ────────────────────────────────────────────────────────────
 const resetSchema = z.object({
-  token:    z.string().min(1),
+  token: z.string().min(1),
   password: z.string().min(8).max(64),
+  confirmPassword: z.string().min(8).max(64),
 });
 
 export async function resetPasswordAction(_prev: unknown, formData: FormData) {
   const parsed = resetSchema.safeParse({
-    token:    formData.get("token"),
+    token: formData.get("token"),
     password: formData.get("password"),
+    confirmPassword: formData.get("confirmPassword"),
   });
   if (!parsed.success) {
     const e = parsed.error.flatten().fieldErrors;
-    return { success: false, error: e.token?.[0] ?? e.password?.[0] ?? "Invalid input" };
+    return { success: false, error: e.token?.[0] ?? e.password?.[0] ?? e.confirmPassword?.[0] ?? "Invalid input" };
   }
 
-  const { token, password } = parsed.data;
+  const { token, password, confirmPassword } = parsed.data;
+
+  if (password !== confirmPassword) {
+    return { success: false, error: "Passwords do not match" };
+  }
 
   const record = await prisma.passwordResetToken.findUnique({
     where: { token },

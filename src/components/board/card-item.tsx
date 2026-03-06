@@ -16,7 +16,7 @@ type CardData = {
 
 const PRIORITY_COLORS: Record<string, string> = {
   LOW: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400",
-  MEDIUM: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+  MEDIUM: "bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary",
   HIGH: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
   URGENT: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
 };
@@ -34,7 +34,7 @@ export function CardItem({ card, isDragging, onClick }: Props) {
     <div
       onClick={onClick}
       className={cn(
-        "group cursor-pointer rounded-lg border border-border/60 bg-card p-3 shadow-sm transition-all",
+        "group cursor-pointer rounded-xl border border-border/60 bg-card p-3 shadow-sm transition-all",
         "hover:shadow-md hover:border-border",
         isDragging && "shadow-xl ring-2 ring-primary/30 rotate-1 scale-105"
       )}
@@ -73,7 +73,7 @@ export function CardItem({ card, isDragging, onClick }: Props) {
             <span
               className={cn(
                 "flex items-center gap-1 rounded text-[11px]",
-                isOverdue ? "text-red-600" : "text-muted-foreground"
+                isOverdue ? "text-destructive" : "text-muted-foreground"
               )}
             >
               <CalendarDays className="h-3 w-3" />
