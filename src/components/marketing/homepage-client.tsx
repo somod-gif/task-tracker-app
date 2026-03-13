@@ -21,12 +21,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const companies = [
-  { name: "Notion", logo: "https://logo.clearbit.com/notion.so" },
-  { name: "Linear", logo: "https://logo.clearbit.com/linear.app" },
-  { name: "Atlassian", logo: "https://logo.clearbit.com/atlassian.com" },
-  { name: "Figma", logo: "https://logo.clearbit.com/figma.com" },
-  { name: "Slack", logo: "https://logo.clearbit.com/slack.com" },
-  { name: "GitHub", logo: "https://logo.clearbit.com/github.com" },
+  { name: "Ashlab", logo: "/ashlab-logo.png" },
+  { name: "Quodel", logo: "/quodel-logo.png" },
 ];
 
 const features = [
@@ -59,20 +55,38 @@ const features = [
 
 const benefits = [
   {
-    title: "Better productivity",
-    description: "Spend less time in meetings and status chats. Work moves visually and clearly.",
+    title: "Less status-meeting overhead",
+    description: "Your board becomes the source of truth, so updates happen in context instead of scattered chats.",
   },
   {
-    title: "Clear collaboration",
-    description: "Everyone sees what is in progress, blocked, and done at a glance.",
+    title: "Shared team visibility",
+    description: "Everyone can see what is blocked, what is active, and what is ready to ship in one place.",
   },
   {
-    title: "Project visibility",
-    description: "Leaders track outcomes without micromanaging day-to-day task details.",
+    title: "Predictable delivery",
+    description: "Priorities, deadlines, and ownership are explicit, making sprint outcomes easier to forecast.",
   },
   {
-    title: "Task accountability",
-    description: "Each card has an owner, priority, and due date to drive ownership.",
+    title: "Built-in accountability",
+    description: "Every card has a clear owner and due date, reducing dropped tasks and unclear handoffs.",
+  },
+];
+
+const workflowStages = [
+  {
+    icon: Layers,
+    title: "Plan the work",
+    description: "Define boards, lists, and priorities for the sprint so everyone starts aligned.",
+  },
+  {
+    icon: Users,
+    title: "Execute together",
+    description: "Assign cards, collaborate in comments, and update progress live as work moves.",
+  },
+  {
+    icon: Bell,
+    title: "Ship with confidence",
+    description: "Track due dates and notifications so nothing important slips through before release.",
   },
 ];
 
@@ -105,7 +119,7 @@ const cardVariants = {
 export function HomePageClient() {
   return (
     <main className="relative overflow-hidden">
-      <section className="relative isolate mx-auto max-w-7xl px-4 pb-20 pt-10 lg:pb-28 lg:pt-16">
+      <section className="relative isolate mx-auto flex min-h-[calc(100vh-5rem)] max-w-7xl items-center px-4 py-8 lg:py-10">
         <motion.div
           aria-hidden
           className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,_rgba(1,120,211,0.28),_transparent_45%),radial-gradient(circle_at_80%_10%,_rgba(20,161,239,0.22),_transparent_38%)]"
@@ -118,14 +132,14 @@ export function HomePageClient() {
           animate={{ y: [0, -10, 0] }}
           transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
         >
-          +12 tasks completed today
+          14 tasks completed today
         </motion.div>
         <motion.div
           className="absolute right-6 top-36 hidden rounded-xl border border-primary/20 bg-card/80 px-3 py-2 text-xs font-medium shadow-lg backdrop-blur lg:block"
           animate={{ y: [0, 12, 0] }}
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
         >
-          98.2% team on-time delivery
+          96% on-time delivery this sprint
         </motion.div>
 
         <div className="grid items-center gap-12 lg:grid-cols-2">
@@ -138,19 +152,19 @@ export function HomePageClient() {
           >
             <Badge variant="outline" className="border-primary/30 bg-primary/10 px-3 py-1 text-primary">
               <Sparkles className="mr-1 size-3" />
-              Built for modern product teams
+              Built for teams that ship weekly
             </Badge>
             <h1 className="text-4xl font-bold tracking-tight md:text-5xl xl:text-6xl">
-              Plan, track, and ship work faster with visual team workflows
+              Keep your team aligned from backlog to done
             </h1>
             <p className="max-w-xl text-lg text-muted-foreground md:text-xl">
-              Sprint Desk helps teams organize projects through workspaces, boards, lists, and cards — with the speed of Trello,
-              the clarity of Notion, and the polish of Linear.
+              Sprint Desk gives product, engineering, and operations teams one clear place to plan tasks, run sprints,
+              and deliver work on time.
             </p>
             <div className="flex flex-wrap gap-3">
               <Button size="lg" asChild>
                 <Link href="/register">
-                  Get Started
+                  Create your workspace
                   <ArrowRight className="ml-2 size-4" />
                 </Link>
               </Button>
@@ -158,7 +172,20 @@ export function HomePageClient() {
                 <Link href="/login">Sign In</Link>
               </Button>
             </div>
-            <p className="text-sm text-muted-foreground">No credit card required • Free forever plan available</p>
+            <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5">
+                <CheckCircle2 className="size-4 text-primary" />
+                No credit card required
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <CheckCircle2 className="size-4 text-primary" />
+                Setup in under 10 minutes
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <CheckCircle2 className="size-4 text-primary" />
+                Free plan available
+              </span>
+            </div>
           </motion.div>
 
           <motion.div
@@ -206,9 +233,9 @@ export function HomePageClient() {
       <section className="mx-auto max-w-7xl px-4 py-20">
         <div className="mx-auto max-w-3xl text-center">
           <Badge variant="outline">Product Overview</Badge>
-          <h2 className="mt-4 text-3xl font-bold tracking-tight md:text-4xl">Simple system. Powerful execution.</h2>
+          <h2 className="mt-4 text-3xl font-bold tracking-tight md:text-4xl">A simple workflow your whole team can follow</h2>
           <p className="mt-4 text-muted-foreground md:text-lg">
-            Organize work in a hierarchy your team instantly understands: workspaces hold boards, boards hold lists, and lists hold actionable cards.
+            Work moves in three clear steps: set up a workspace, run execution on boards, and ship by moving cards to done.
           </p>
         </div>
 
@@ -218,15 +245,22 @@ export function HomePageClient() {
               <CardHeader>
                 <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary">Step {index + 1}</div>
                 <CardTitle>{step}</CardTitle>
+                <CardDescription>
+                  {index === 0
+                    ? "Invite teammates, define your project scope, and organize where work will live."
+                    : index === 1
+                    ? "Create lists for each stage and prioritize the highest-impact tasks first."
+                    : "Track progress visually and close cards as outcomes are delivered."}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <Image
                   src={
                     index === 0
-                      ? "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=900&q=80"
+                      ? "/step1.png"
                       : index === 1
                       ? "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=900&q=80"
-                      : "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=900&q=80"
+                      : "/step3.png"
                   }
                   alt={`${step} preview`}
                   width={900}
@@ -312,14 +346,19 @@ export function HomePageClient() {
       <section className="bg-muted/20 py-20">
         <div className="mx-auto max-w-6xl px-4 text-center">
           <Badge variant="outline">Workflow</Badge>
-          <h2 className="mt-4 text-3xl font-bold tracking-tight md:text-4xl">From user to delivery, clearly mapped</h2>
+          <h2 className="mt-4 text-3xl font-bold tracking-tight md:text-4xl">How teams use Sprint Desk day to day</h2>
 
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-2 md:gap-4">
-            {["User", "Workspace", "Board", "List", "Card"].map((node, index, arr) => (
-              <div key={node} className="flex items-center gap-2 md:gap-4">
-                <div className="rounded-full border border-border bg-card px-4 py-2 text-sm font-medium shadow-sm">{node}</div>
-                {index < arr.length - 1 ? <ArrowRight className="size-4 text-muted-foreground" /> : null}
-              </div>
+          <div className="mt-10 grid gap-4 md:grid-cols-3">
+            {workflowStages.map((stage) => (
+              <Card key={stage.title} className="border-border/70 bg-card/80 text-left">
+                <CardHeader>
+                  <div className="mb-2 w-fit rounded-lg bg-primary/10 p-2">
+                    <stage.icon className="size-5 text-primary" />
+                  </div>
+                  <CardTitle className="text-xl">{stage.title}</CardTitle>
+                  <CardDescription>{stage.description}</CardDescription>
+                </CardHeader>
+              </Card>
             ))}
           </div>
         </div>
@@ -372,30 +411,30 @@ export function HomePageClient() {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 pb-20 pt-8">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-secondary to-accent p-10 text-primary-foreground shadow-2xl md:p-14">
+        <div className="relative overflow-hidden rounded-3xl border border-border/70 bg-card p-10 shadow-2xl md:p-14">
           <motion.div
             aria-hidden
-            className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-white/20 blur-3xl"
+            className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-primary/10 blur-3xl"
             animate={{ scale: [1, 1.15, 1] }}
             transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
           />
 
           <div className="relative mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Ready to run your team with clarity?</h2>
-            <p className="mt-4 text-primary-foreground/90 md:text-lg">
-              Join teams using Sprint Desk to plan faster, collaborate better, and deliver consistently.
+            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Ready to make delivery more predictable?</h2>
+            <p className="mt-4 text-muted-foreground md:text-lg">
+              Bring your backlog, sprint work, and progress updates into one workflow your team can trust.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <Button size="lg" variant="secondary" asChild>
+              <Button size="lg" asChild>
                 <Link href="/register">
-                  Get Started
+                  Start free
                   <ArrowRight className="ml-2 size-4" />
                 </Link>
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10"
+                className="border-border/70 bg-transparent"
                 asChild
               >
                 <Link href="/login">Sign In</Link>
