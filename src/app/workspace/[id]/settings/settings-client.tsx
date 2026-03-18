@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { updateWorkspaceAction, deleteWorkspaceAction } from "@/server/actions/workspace-actions";
 import { appToast } from "@/lib/toast";
 
@@ -20,6 +21,7 @@ export function SettingsClient({ workspaceId, name: initName, description: initD
   const router = useRouter();
   const [name, setName] = useState(initName);
   const [description, setDescription] = useState(initDesc ?? "");
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   function handleSave(e: React.FormEvent) {
@@ -31,12 +33,12 @@ export function SettingsClient({ workspaceId, name: initName, description: initD
     });
   }
 
-  function handleDelete() {
-    if (!confirm(`Delete "${name}"? This will permanently delete all boards, lists, and cards. This cannot be undone.`)) return;
+  function handleDeleteConfirm() {
     startTransition(async () => {
       const res = await deleteWorkspaceAction(workspaceId);
       if (res.success) {
         appToast.success("Workspace deleted");
+        setConfirmDeleteOpen(false);
         router.push("/workspace");
       } else {
         appToast.error((res as { error?: string }).error ?? "Failed");
@@ -83,11 +85,22 @@ export function SettingsClient({ workspaceId, name: initName, description: initD
           <p className="text-sm text-muted-foreground">
             Deleting this workspace will permanently remove all boards, lists, cards, and members. This action cannot be undone.
           </p>
-          <Button variant="destructive" onClick={handleDelete} disabled={isPending}>
+          <Button variant="destructive" onClick={() => setConfirmDeleteOpen(true)} disabled={isPending}>
             Delete workspace
           </Button>
         </section>
       )}
+
+      <ConfirmDialog
+        open={confirmDeleteOpen}
+        onOpenChange={setConfirmDeleteOpen}
+        title={`Delete "${name}"?`}
+        description="This will permanently delete all boards, lists, cards, and members in this workspace. This action cannot be undone."
+        confirmLabel="Delete workspace"
+        destructive
+        loading={isPending}
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 }

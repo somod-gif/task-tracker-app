@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { UserMinus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { removeMemberAction, updateMemberRoleAction } from "@/server/actions/workspace-actions";
 import { InviteMemberDialog } from "@/components/workspace/invite-member-dialog";
 import { appToast } from "@/lib/toast";
@@ -27,14 +28,22 @@ const ROLE_COLORS: Record<string, string> = {
 
 export function MembersClient({ workspaceId, workspaceName, members: initial, currentUserId, canManage }: Props) {
   const [members, setMembers] = useState(initial);
+  const [memberToRemove, setMemberToRemove] = useState<Member | null>(null);
   const [isPending, startTransition] = useTransition();
 
   function handleRemove(memberId: string) {
-    if (!confirm("Remove this member from the workspace?")) return;
+    const member = members.find((m) => m.id === memberId) ?? null;
+    setMemberToRemove(member);
+  }
+
+  function confirmRemove() {
+    if (!memberToRemove) return;
+
     startTransition(async () => {
-      const res = await removeMemberAction({ workspaceId, memberId });
+      const res = await removeMemberAction({ workspaceId, memberId: memberToRemove.id });
       if (res.success) {
-        setMembers((prev) => prev.filter((m) => m.id !== memberId));
+        setMembers((prev) => prev.filter((m) => m.id !== memberToRemove.id));
+        setMemberToRemove(null);
         appToast.success("Member removed");
       } else {
         appToast.error(res.error ?? "Failed");
@@ -134,6 +143,19 @@ export function MembersClient({ workspaceId, workspaceName, members: initial, cu
           );
         })}
       </div>
+
+      <ConfirmDialog
+        open={Boolean(memberToRemove)}
+        onOpenChange={(open) => {
+          if (!open) setMemberToRemove(null);
+        }}
+        title={memberToRemove ? `Remove ${memberToRemove.name}?` : "Remove member?"}
+        description="This member will lose access to this workspace immediately."
+        confirmLabel="Remove member"
+        destructive
+        loading={isPending}
+        onConfirm={confirmRemove}
+      />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { X, Calendar, Flag, Loader2, Trash2, UserPlus, UserMinus, Send } from "l
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
   getCardDetailAction,
   updateCardAction,
@@ -54,6 +55,7 @@ export function CardModal({ cardId, workspaceId, workspaceMembers, canManage, on
   const [priority, setPriority] = useState<string>("MEDIUM");
   const [comment, setComment] = useState("");
   const [showMemberPicker, setShowMemberPicker] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -88,11 +90,11 @@ export function CardModal({ cardId, workspaceId, workspaceMembers, canManage, on
     });
   }
 
-  function handleDelete() {
-    if (!confirm("Delete this card permanently?")) return;
+  function handleDeleteConfirm() {
     startTransition(async () => {
       const res = await deleteCardAction(workspaceId, cardId);
       if (res.success) {
+        setConfirmDeleteOpen(false);
         appToast.success("Card deleted");
         onCardDeleted?.();
         onClose();
@@ -336,7 +338,7 @@ export function CardModal({ cardId, workspaceId, workspaceMembers, canManage, on
                   variant="destructive"
                   size="sm"
                   className="w-full"
-                  onClick={handleDelete}
+                  onClick={() => setConfirmDeleteOpen(true)}
                   disabled={isPending}
                 >
                   <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Delete Card
@@ -350,6 +352,17 @@ export function CardModal({ cardId, workspaceId, workspaceMembers, canManage, on
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={confirmDeleteOpen}
+        onOpenChange={setConfirmDeleteOpen}
+        title="Delete this card?"
+        description="This will permanently remove the card and its related activity from the board. This action cannot be undone."
+        confirmLabel="Delete card"
+        destructive
+        loading={isPending}
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 }
