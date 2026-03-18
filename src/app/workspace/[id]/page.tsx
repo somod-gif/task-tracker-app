@@ -40,16 +40,19 @@ export default async function WorkspacePage({ params }: Props) {
   ];
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <h1 className="text-2xl font-bold">{workspace.name}</h1>
           {workspace.description && (
             <p className="text-sm text-muted-foreground">{workspace.description}</p>
           )}
+          <p className="mt-2 text-xs text-muted-foreground">
+            Use this workspace to create boards, invite members, and manage delivery from backlog to done.
+          </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Link href={`/workspace/${workspaceId}/members`}>
             <Button variant="outline" size="sm" className="gap-1.5">
               <Users className="h-4 w-4" /> Members
@@ -74,9 +77,12 @@ export default async function WorkspacePage({ params }: Props) {
 
       {/* Boards */}
       {boards.length === 0 ? (
-        <div className="flex h-64 flex-col items-center justify-center rounded-xl border border-dashed border-border">
+        <div className="flex min-h-64 flex-col items-center justify-center rounded-xl border border-dashed border-border px-4 text-center">
           <LayoutGrid className="h-10 w-10 text-muted-foreground/50" />
           <p className="mt-3 text-base font-medium text-muted-foreground">No boards yet</p>
+          <p className="mt-1 max-w-md text-sm text-muted-foreground">
+            Start by creating a board for your project, then add lists and cards so your team can track progress clearly.
+          </p>
           {isManager && (
             <div className="mt-4">
               <CreateBoardDialog workspaceId={workspaceId}>
@@ -88,7 +94,7 @@ export default async function WorkspacePage({ params }: Props) {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {boards.map((board, i) => {
             const gradient = board.coverColor
               ? ""

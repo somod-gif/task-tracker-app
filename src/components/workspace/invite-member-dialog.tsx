@@ -41,11 +41,14 @@ export function InviteMemberDialog({ workspaceId, children, onInvited }: Props) 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-sm">
+      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-sm">
         <DialogHeader>
           <DialogTitle>Invite a member</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+          <p className="text-xs text-muted-foreground">
+            If this person already has an account, they will be added immediately. Otherwise, they will receive an invite email.
+          </p>
           <div className="space-y-1.5">
             <Label htmlFor="invite-email">Email address *</Label>
             <Input
@@ -86,7 +89,7 @@ export function InviteMemberDialog({ workspaceId, children, onInvited }: Props) 
               Cancel
             </Button>
             <Button type="submit" disabled={isPending || !email.trim()}>
-              {isPending ? "Sending..." : "Send invite"}
+              {isPending ? "Sending..." : "Send invite email"}
             </Button>
           </div>
         </form>

@@ -45,10 +45,11 @@ export function SettingsClient({ workspaceId, name: initName, description: initD
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-8 space-y-10">
+    <div className="mx-auto max-w-2xl space-y-10 px-4 py-6 sm:px-6 sm:py-8">
       <div>
         <h1 className="text-2xl font-bold">Workspace Settings</h1>
-        <p className="text-sm text-muted-foreground mt-1">Manage your workspace details and preferences.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Manage your workspace details and control what members can access.</p>
+        <p className="mt-1 text-xs text-muted-foreground">Changes here affect everyone in this workspace.</p>
       </div>
 
       {/* General */}

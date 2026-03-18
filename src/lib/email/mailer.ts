@@ -1,7 +1,9 @@
 /**
  * Sprint Desk — Email System
- * All transactional emails sent via Nodemailer (SMTP).
+ * All transactional emails sent via Resend API.
  */
+
+import { Resend } from "resend";
 
 const BASE_URL = process.env.BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "https://sprintdesk.com";
 const P = "#262166"; // brand primary
@@ -10,21 +12,24 @@ const A = "#1593c6"; // brand accent
 type Mail = { to: string; subject: string; html: string };
 
 async function send(mail: Mail): Promise<void> {
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT ?? 587);
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-  if (!host || !user || !pass) {
-    console.warn("[mailer] SMTP not configured — skipping:", mail.subject);
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.warn("[mailer] RESEND_API_KEY not configured — skipping:", mail.subject);
     return;
   }
   try {
-    const nodemailer = (await import("nodemailer")) as typeof import("nodemailer");
-    const t = nodemailer.createTransport({ host, port, secure: port === 465, requireTLS: port !== 465, auth: { user, pass } });
-    await t.sendMail({
-      from: process.env.SMTP_FROM ?? `Sprint Desk <${user}>`,
-      to: mail.to, subject: mail.subject, html: mail.html,
+    const resend = new Resend(apiKey);
+    const fromEmail = process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev";
+    const fromName = process.env.RESEND_FROM_NAME ?? "Sprint Desk";
+    const result = await resend.emails.send({
+      from: `${fromName} <${fromEmail}>`,
+      to: [mail.to],
+      subject: mail.subject,
+      html: mail.html,
     });
+    if (result.error) {
+      console.error("[mailer] resend send error:", result.error);
+    }
   } catch (e) { console.error("[mailer] send error:", e); }
 }
 
@@ -124,6 +129,33 @@ export async function sendWorkspaceInviteEmail({
       h2("You have been added to a workspace") +
       p(`<strong>${inviterName}</strong> added you to <strong>"${workspaceName}"</strong> on Sprint Desk.`) +
       cta(`Open "${workspaceName}"`, `${BASE_URL}/workspace/${workspaceId}`)
+    ),
+  });
+}
+
+export async function sendWorkspaceCreatedEmail({
+  to,
+  name,
+  workspaceName,
+  workspaceId,
+}: {
+  to: string;
+  name: string;
+  workspaceName: string;
+  workspaceId: string;
+}) {
+  await send({
+    to,
+    subject: `Workspace "${workspaceName}" is ready`,
+    html: wrap(
+      h2("Your workspace is live") +
+      p(`Hi <strong>${name}</strong>, your workspace <strong>"${workspaceName}"</strong> is ready to use.`) +
+      `<ul style="margin:0 0 16px;padding-left:20px;font-size:14px;color:#4a5568;line-height:1.9;">
+        <li>Create your first board and define stages like To Do, In Progress, and Done</li>
+        <li>Invite teammates and choose their roles</li>
+        <li>Add cards with assignees, priorities, and due dates</li>
+      </ul>` +
+      cta("Open Workspace", `${BASE_URL}/workspace/${workspaceId}`)
     ),
   });
 }

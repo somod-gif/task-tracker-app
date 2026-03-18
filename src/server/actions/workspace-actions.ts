@@ -6,6 +6,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth/session";
 import { requireWorkspaceMember } from "@/lib/rbac";
+import { sendWorkspaceCreatedEmail } from "@/lib/email/mailer";
 import type { WorkspaceRole } from "@/types/domain";
 
 // ─── Create Workspace ──────────────────────────────────────────────────────────
@@ -34,6 +35,15 @@ export async function createWorkspaceAction(input: { name: string; description?:
   await prisma.workspaceMember.create({
     data: { userId: user.id, workspaceId: workspace.id, role: "OWNER" },
   });
+
+  if (user.email) {
+    sendWorkspaceCreatedEmail({
+      to: user.email,
+      name: user.name ?? "there",
+      workspaceName: parsed.data.name,
+      workspaceId: workspace.id,
+    }).catch(() => {});
+  }
 
   revalidatePath("/workspace");
   return { success: true, error: "", data: workspace };

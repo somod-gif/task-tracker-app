@@ -40,11 +40,14 @@ export function CreateWorkspaceDialog({ children, onCreated }: Props) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Create a workspace</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+          <p className="text-xs text-muted-foreground">
+            Workspaces organize your teams and projects. After creating one, you can invite members and create boards.
+          </p>
           <div className="space-y-1.5">
             <Label htmlFor="ws-name">Name *</Label>
             <Input
@@ -61,7 +64,7 @@ export function CreateWorkspaceDialog({ children, onCreated }: Props) {
               id="ws-desc"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="What is this workspace for?"
+              placeholder="Example: Product roadmap and sprint delivery"
               className="resize-none"
               rows={3}
             />

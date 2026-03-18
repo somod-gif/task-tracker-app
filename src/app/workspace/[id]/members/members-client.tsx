@@ -55,17 +55,24 @@ export function MembersClient({ workspaceId, workspaceName, members: initial, cu
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-8">
-      <div className="mb-6 flex items-center justify-between">
+    <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold">{workspaceName}</h1>
           <p className="text-sm text-muted-foreground mt-1">{members.length} member{members.length !== 1 ? "s" : ""}</p>
+          <p className="mt-1 text-xs text-muted-foreground">Manage who has access and what permissions they have in this workspace.</p>
         </div>
         {canManage && (
           <InviteMemberDialog workspaceId={workspaceId} onInvited={() => window.location.reload()}>
             <Button>Invite member</Button>
           </InviteMemberDialog>
         )}
+      </div>
+
+      <div className="mb-4 rounded-lg border bg-card/70 p-3 text-sm text-muted-foreground">
+        <p><span className="font-medium text-foreground">Owner:</span> full control, including deleting workspace.</p>
+        <p><span className="font-medium text-foreground">Admin:</span> can manage members and workspace settings.</p>
+        <p><span className="font-medium text-foreground">Member:</span> can collaborate on boards and tasks.</p>
       </div>
 
       <div className="rounded-xl border divide-y">

@@ -7,9 +7,9 @@ export default async function WorkspaceLayout({ children }: { children: React.Re
   if (!user) redirect("/login");
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
-      <WorkspaceSidebar userId={user.id} userName={user.name ?? ""} userEmail={user.email ?? ""} userAvatar={user.avatar ?? null} />
-      <main className="flex-1 overflow-y-auto">
+    <div className="min-h-screen bg-background md:flex md:h-screen md:overflow-hidden">
+      <WorkspaceSidebar userName={user.name ?? ""} userEmail={user.email ?? ""} userAvatar={user.avatar ?? null} />
+      <main className="min-w-0 md:flex-1 md:overflow-y-auto">
         {children}
       </main>
     </div>
